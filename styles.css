@@ -315,6 +315,26 @@ body {
     color: #888;
 }
 
+/* Favorite toggle */
+.track-favorite {
+    margin-top: 5px;
+    display: flex;
+    align-items: center;
+}
+
+.track-favorite-icon {
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.track-favorite-icon:hover {
+    transform: scale(1.1);
+}
+
+.track-favorite-icon svg {
+    display: block;
+}
+
 /* ============================================================================
  * SPECTRUM VISUALIZER
  * ============================================================================ */

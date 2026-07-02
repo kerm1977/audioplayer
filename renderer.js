@@ -47,6 +47,7 @@ let conversionModal, progressModal, currentFileName, currentFormat, targetFormat
 let helpModal, closeHelpModal, helpBtn, helpBtnTop;
 let searchInput, searchInfo;
 let favoritesList;
+let favoriteIcon;
 
 // ============================================================================
 // FAVORITES SYSTEM
@@ -138,6 +139,9 @@ function initDOMElements() {
 
     // Favorites list
     favoritesList = document.getElementById('favoritesList');
+
+    // Favorite icon
+    favoriteIcon = document.getElementById('favoriteIcon');
 
     // Log missing elements
     const missing = [];
@@ -262,8 +266,27 @@ function initEventListeners() {
     // Language selector
     languageSelector.addEventListener('change', (e) => {
         currentLanguage = e.target.value;
-        // updateLanguage();  // Temporarily disabled
+        updateLanguage();
     });
+
+    // Favorite icon click
+    if (favoriteIcon) {
+        favoriteIcon.addEventListener('click', () => {
+            if (currentTrackIndex >= 0) {
+                const track = playlist[currentTrackIndex];
+                if (track) {
+                    if (favorites.has(track.path)) {
+                        favorites.delete(track.path);
+                    } else {
+                        favorites.add(track.path);
+                    }
+                    renderFavorites();
+                    updateCounters();
+                    updateTrackInfo(track);
+                }
+            }
+        });
+    }
 
     // Help button in top bar
     helpBtnTop.addEventListener('click', () => {
@@ -969,6 +992,15 @@ function updateTrackInfo(track) {
     trackTitle.textContent = `${t.title_label}: ${track.title || 'Desconocido'}`;
     trackArtist.textContent = `${t.artist_label}: ${track.artist || 'Desconocido'}`;
     trackAlbum.textContent = `${t.album_label}: ${track.album || 'Desconocido'}`;
+
+    // Update favorite icon color
+    if (favoriteIcon) {
+        const isFavorite = favorites.has(track.path);
+        const heartIcon = isFavorite ?
+            '<svg class="heart-icon" viewBox="0 0 24 24" width="20" height="20" fill="#ff6b35"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>' :
+            '<svg class="heart-icon" viewBox="0 0 24 24" width="20" height="20" fill="#666"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
+        favoriteIcon.innerHTML = heartIcon;
+    }
 }
 
 // ============================================================================
@@ -1666,11 +1698,14 @@ function updateLanguage() {
                 helpShortcuts[1].innerHTML = `<strong>${t.helpShortcuts}</strong>`;
             }
             const helpShortcutsList = helpModal.querySelectorAll('.help-info li');
-            if (helpShortcutsList.length >= 4) {
+            if (helpShortcutsList.length >= 7) {
                 helpShortcutsList[0].textContent = t.shortcutSpace;
                 helpShortcutsList[1].textContent = t.shortcutRight;
                 helpShortcutsList[2].textContent = t.shortcutLeft;
                 helpShortcutsList[3].textContent = t.shortcutF12;
+                helpShortcutsList[4].textContent = t.shortcutShiftA;
+                helpShortcutsList[5].textContent = t.shortcutShiftC;
+                helpShortcutsList[6].textContent = t.shortcutShiftE;
             }
         }
 
