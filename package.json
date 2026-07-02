@@ -1,0 +1,54 @@
+{
+  "name": "audioplayer-electron",
+  "version": "1.0.0",
+  "description": "Reproductor de audio universal estilo AIMP",
+  "main": "main.js",
+  "homepage": "https://github.com/audioplayer/audioplayer-electron",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "build:deb": "electron-builder --linux deb",
+    "build:appimage": "electron-builder --linux AppImage",
+    "build:rpm": "electron-builder --linux rpm"
+  },
+  "keywords": [
+    "audio",
+    "player",
+    "electron",
+    "aimp"
+  ],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "@ffmpeg/ffmpeg": "^0.12.10",
+    "@ffmpeg/util": "^0.12.1",
+    "fluent-ffmpeg": "^2.1.2",
+    "music-metadata": "^8.1.4",
+    "music-metadata-browser": "^2.2.6"
+  },
+  "build": {
+    "appId": "com.audioplayer.app",
+    "productName": "AudioPlayer",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist/**"
+    ],
+    "linux": {
+      "target": [
+        "deb",
+        "AppImage",
+        "rpm"
+      ],
+      "category": "Audio",
+      "maintainer": "AudioPlayer Team"
+    }
+  }
+}

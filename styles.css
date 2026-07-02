@@ -1,0 +1,1421 @@
+/* ============================================================================
+ * AUDIO PLAYER ELECTRON - STYLES
+ * ============================================================================
+ * This file contains all CSS styling for the audio player application.
+ * Theme: Dark with orange accent (#ff6b35)
+ * Layout: Grid-based with playlist on left, player on right, actions at bottom
+ * ============================================================================ */
+
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* html - transparent base for rounded corners */
+html {
+    border-radius: 14px;
+    overflow: hidden;
+    background: transparent;
+}
+
+/* Body styling - dark gradient background with rounded corners */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+    color: #e0e0e0;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    border-radius: 14px;
+    border: 1px solid #444;
+    box-shadow: 0 0 0 1px #222 inset;
+}
+
+/* ============================================================================
+ * SEARCH BAR
+ * ============================================================================ */
+
+/* Thin drag strip at the very top - also hosts window control buttons */
+.drag-strip {
+    height: 28px;
+    background: #1a1a1a;
+    -webkit-app-region: drag;
+    flex-shrink: 0;
+    border-radius: 14px 14px 0 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 10px;
+}
+
+.drag-strip .window-controls {
+    -webkit-app-region: no-drag;
+}
+
+/* Search bar container - drag region for frameless window */
+.search-bar-container {
+    background: #252525;
+    padding: 10px 20px;
+    border-bottom: 1px solid #3a3a3a;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-shrink: 0;
+    -webkit-app-region: drag;   /* Make this area draggable */
+}
+
+/* Non-draggable elements inside drag region */
+.search-bar-container input,
+.search-bar-container button,
+.search-bar-container .search-info {
+    -webkit-app-region: no-drag;
+}
+
+/* Custom window control buttons */
+.window-title {
+    flex: 1;
+    font-size: 12px;
+    font-weight: 600;
+    color: #e0e0e0;
+    text-align: center;
+    letter-spacing: 1px;
+    user-select: none;
+}
+
+.window-controls {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-left: 4px;
+}
+
+.win-btn {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-size: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: transparent;
+    transition: color 0.15s, opacity 0.15s;
+    padding: 0;
+    line-height: 1;
+}
+
+.win-btn:hover {
+    color: rgba(0,0,0,0.7);
+}
+
+.win-minimize {
+    background: #f5c400;
+}
+
+.win-maximize {
+    background: #28c840;
+}
+
+.win-close {
+    background: #ff5f57;
+}
+
+/* Search input field */
+.search-input {
+    flex: 1;
+    max-width: 420px;
+    background: #2e2e2e;
+    border: 1px solid #3a3a3a;
+    border-radius: 20px;
+    padding: 8px 12px;
+    color: #e0e0e0;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.search-input:focus {
+    border-color: #ff6b35;
+}
+
+.search-input::placeholder {
+    color: #888;
+}
+
+/* Search info - shows number of results */
+.search-info {
+    color: #888;
+    font-size: 12px;
+    white-space: nowrap;
+}
+
+/* Help button in top bar */
+.help-btn-top {
+    background: #3a3a3a;
+    border: 1px solid #4a4a4a;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s, border-color 0.3s;
+    flex-shrink: 0;
+    color: #e0e0e0;
+    font-weight: bold;
+}
+
+.help-btn-top:hover {
+    background: #4a4a4a;
+    border-color: #ff6b35;
+    color: #ff6b35;
+}
+
+/* ============================================================================
+ * MAIN LAYOUT - CSS GRID
+ * ============================================================================ */
+
+/* Main container - 2-column grid layout */
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;  /* Two equal columns */
+    grid-template-rows: 1fr auto;      /* Main content + actions row */
+    height: 100%;
+    min-height: 0;
+    padding: 20px;
+    gap: 15px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* Playlist container - left column */
+.playlist-container {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Player container - right column */
+.player-container {
+    grid-column: 2;
+    grid-row: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Actions bar - spans both columns at bottom, never hidden */
+.actions {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    flex-shrink: 0;
+}
+
+/* ============================================================================
+ * PLAYER HEADER (Cover Art + Track Info)
+ * ============================================================================ */
+
+.header {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    padding: 15px;
+    background: #252525;
+    border-radius: 8px;
+    border: 1px solid #3a3a3a;
+}
+
+/* Album art display */
+.cover-art {
+    width: 120px;
+    height: 120px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    border: 2px solid #3a3a3a;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.2s;
+}
+
+.cover-art:hover {
+    border-color: #ff6b35;
+}
+
+.cover-art::after {
+    content: '🖼 Cambiar';
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #fff;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.cover-art:hover::after {
+    opacity: 1;
+}
+
+.cover-art img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Placeholder text when no cover art is available */
+.no-cover {
+    color: #666;
+    font-size: 12px;
+    text-align: center;
+}
+
+/* Track information container */
+.track-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Track title - orange accent color */
+.track-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #ff6b35;  /* Primary orange accent */
+}
+
+/* Artist name */
+.track-artist {
+    font-size: 16px;
+    color: #b0b0b0;
+}
+
+/* Album name */
+.track-album {
+    font-size: 14px;
+    color: #888;
+}
+
+/* ============================================================================
+ * SPECTRUM VISUALIZER
+ * ============================================================================ */
+
+.visualizer {
+    height: 100px;
+    background: #1a1a1a;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #3a3a3a;
+}
+
+/* Canvas element for drawing spectrum bars */
+#visualizerCanvas {
+    width: 100%;
+    height: 100%;
+}
+
+/* ============================================================================
+ * SEEK SLIDER AND TIME DISPLAY
+ * ============================================================================ */
+
+.seek-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Seek slider - orange thumb for visual feedback */
+.seek-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #3a3a3a;
+    outline: none;
+}
+
+/* Seek slider thumb - orange accent color */
+.seek-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #ff6b35;  /* Orange accent */
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.seek-slider::-webkit-slider-thumb:hover {
+    background: #ff8555;  /* Lighter orange on hover */
+}
+
+/* Time display (current time / total time) */
+.time-display {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #b0b0b0;
+}
+
+.separator {
+    color: #666;
+}
+
+/* ============================================================================
+ * PLAYBACK CONTROL BUTTONS
+ * ============================================================================ */
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 10px;
+    background: #252525;
+    border-radius: 8px;
+    border: 1px solid #3a3a3a;
+}
+
+/* Control button base styling */
+.control-btn {
+    width: 45px;
+    height: 45px;
+    border: none;
+    border-radius: 8px;
+    background: #3a3a3a;
+    color: #e0e0e0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.control-btn:hover {
+    background: #4a4a4a;
+    transform: scale(1.05);
+}
+
+/* Active state for shuffle/repeat buttons - orange highlight */
+.control-btn.active {
+    color: #ff6b35;
+    background: #2a2a2a;
+}
+
+.control-btn.active svg {
+    fill: #ff6b35;  /* Orange fill for active state */
+}
+
+.control-btn:active {
+    transform: scale(0.95);
+}
+
+.control-btn svg {
+    fill: currentColor;
+}
+
+/* Play button - larger and orange for emphasis */
+.play-btn {
+    width: 55px;
+    height: 55px;
+    background: #ff6b35;  /* Orange accent */
+}
+
+.play-btn:hover {
+    background: #ff8555;  /* Lighter orange on hover */
+}
+
+/* ============================================================================
+ * VOLUME CONTROL
+ * ============================================================================ */
+
+.volume-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    background: #252525;
+    border-radius: 8px;
+    border: 1px solid #3a3a3a;
+}
+
+.volume-icon {
+    fill: #b0b0b0;
+}
+
+/* Volume slider - blue accent color (different from orange) */
+.volume-slider {
+    -webkit-appearance: none;
+    flex: 1;
+    height: 4px;
+    border-radius: 2px;
+    background: #3a3a3a;
+    outline: none;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #4a90e2;  /* Blue accent for volume */
+    cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+    background: #5aa0f2;  /* Lighter blue on hover */
+}
+
+/* ============================================================================
+ * ACTION BUTTONS (Add Files, Add Folder, Edit Metadata)
+ * ============================================================================ */
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* Action button styling */
+.action-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    background: #3a3a3a;
+    color: #e0e0e0;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.action-btn kbd {
+    font-size: 10px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background: #252525;
+    border: 1px solid #555;
+    color: #aaa;
+    font-family: inherit;
+}
+
+/* ============================================================================
+ * METADATA MODAL
+ * ============================================================================ */
+
+.metadata-cover-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin-bottom: 4px;
+}
+
+.metadata-cover-preview {
+    width: 90px;
+    height: 90px;
+    border-radius: 6px;
+    background: #1a1a1a;
+    border: 2px solid #3a3a3a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    font-size: 11px;
+    color: #555;
+    text-align: center;
+}
+
+.metadata-cover-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.metadata-cover-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: center;
+}
+
+.metadata-cover-actions .browse-btn {
+    font-size: 12px;
+    padding: 6px 10px;
+    white-space: nowrap;
+}
+
+.metadata-collection-cover {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #aaa;
+    cursor: pointer;
+    margin-top: 4px;
+}
+
+.metadata-cover-btns {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #333;
+}
+
+.metadata-cover-btns .browse-btn {
+    font-size: 12px;
+    padding: 7px 12px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+}
+
+.metadata-collection-cover input[type="checkbox"] {
+    accent-color: #ff6b35;
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    background: #4a4a4a;
+}
+
+.action-btn:active {
+    transform: scale(0.98);
+}
+
+/* Language selector dropdown */
+.language-selector {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    background: #3a3a3a;
+    color: #e0e0e0;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 120px;
+}
+
+.language-selector:hover {
+    background: #4a4a4a;
+}
+
+.language-selector option {
+    background: #2d2d2d;
+    color: #e0e0e0;
+}
+
+/* Language container with help button */
+.language-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background: #252525;
+    border-radius: 8px;
+    border: 1px solid #3a3a3a;
+}
+
+.language-container label {
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* ============================================================================
+ * PLAYLIST STYLING
+ * ============================================================================ */
+
+.playlist-container {
+    display: flex;
+    flex-direction: column;
+    background: #252525;
+    border-radius: 8px;
+    border: 1px solid #3a3a3a;
+    overflow: hidden;
+    max-height: 100%;
+}
+
+/* Playlist header text */
+.playlist-header {
+    padding: 12px 15px;
+    background: #2d2d2d;
+    font-weight: bold;
+    border-bottom: 1px solid #3a3a3a;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.playlist-count, .favorites-count {
+    background: #ff6b35;
+    color: #fff;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* Collections area (top half of playlist container) */
+.collections {
+    flex: 1;
+    overflow-y: auto;
+    padding: 5px;
+    max-height: 40%;
+}
+
+/* Custom scrollbar for collections */
+.collections::-webkit-scrollbar {
+    width: 8px;
+}
+
+.collections::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.collections::-webkit-scrollbar-thumb {
+    background: #3a3a3a;
+    border-radius: 4px;
+}
+
+.collections::-webkit-scrollbar-thumb:hover {
+    background: #4a4a4a;
+}
+
+/* Collection item */
+.collection-item {
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+.collection-item:hover {
+    background: #3a3a3a;
+}
+
+/* Currently selected collection - orange highlight */
+.collection-item.active {
+    background: #ff6b35;
+    color: white;
+}
+
+.collection-item-icon {
+    font-size: 18px;
+}
+
+.collection-item-name {
+    flex: 1;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.collection-item-count {
+    color: #888;
+    font-size: 12px;
+}
+
+/* Scrollable playlist area (bottom half) */
+.playlist {
+    flex: 1;
+    overflow-y: auto;
+    padding: 5px;
+    max-height: 60%;
+}
+
+/* Custom scrollbar for playlist */
+.playlist::-webkit-scrollbar {
+    width: 8px;
+}
+
+.playlist::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.playlist::-webkit-scrollbar-thumb {
+    background: #3a3a3a;
+    border-radius: 4px;
+}
+
+.playlist::-webkit-scrollbar-thumb:hover {
+    background: #4a4a4a;
+}
+
+/* Individual playlist item */
+.playlist-item {
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.playlist-item:hover {
+    background: #3a3a3a;
+}
+
+/* Currently playing track - orange highlight */
+.playlist-item.active {
+    background: #ff6b35;  /* Orange accent for active track */
+    color: white;
+}
+
+/* Alternating row colors for better readability */
+.playlist-item:nth-child(even) {
+    background: #2a2a2a;
+}
+
+/* Search result styling */
+.playlist-item.search-result {
+    background: #2a2a2a;
+}
+
+.playlist-item-collection {
+    font-size: 11px;
+    color: #888;
+    max-width: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.playlist-item:nth-child(even):hover {
+    background: #3a3a3a;
+}
+
+/* Track number in playlist */
+.playlist-item-number {
+    font-size: 11px;
+    color: #555;
+    min-width: 20px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.playlist-item.active .playlist-item-number {
+    color: white;
+}
+
+/* Favorite heart icon container */
+.playlist-item-favorite {
+    cursor: pointer;
+    transition: transform 0.2s;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+}
+
+.playlist-item-favorite:hover {
+    transform: scale(1.2);  /* Scale up on hover */
+}
+
+.heart-icon {
+    flex-shrink: 0;
+}
+
+/* Track title text */
+.playlist-item-title {
+    flex: 1;
+    font-size: 14px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Track duration text */
+.playlist-item-duration {
+    color: #888;
+    font-size: 13px;
+    flex-shrink: 0;
+}
+
+/* Empty playlist message */
+.empty-playlist {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+}
+
+/* Global scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3a3a3a;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #4a4a4a;
+}
+
+/* ============================================================================
+ * CONTEXT MENU (Right-click on playlist items)
+ * ============================================================================ */
+
+.context-menu {
+    position: fixed;
+    background: #2d2d2d;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    min-width: 200px;
+    padding: 5px 0;
+}
+
+/* Context menu item - flex layout for icon + text */
+.context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: #e0e0e0;
+    font-size: 14px;
+}
+
+/* Context menu item hover - orange highlight */
+.context-menu-item:hover {
+    background: #ff6b35;  /* Orange accent on hover */
+    color: white;
+}
+
+/* Separator line in context menu */
+.context-menu-separator {
+    height: 1px;
+    background: #3a3a3a;
+    margin: 5px 0;
+}
+
+/* ============================================================================
+ * MODAL DIALOGS (Help, Conversion, Progress)
+ * ============================================================================ */
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);  /* Semi-transparent overlay */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+}
+
+/* Modal content box */
+.modal-content {
+    background: #252525;
+    border-radius: 12px;
+    border: 1px solid #3a3a3a;
+    width: 90%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Smaller modal variant */
+.modal-content.small {
+    max-width: 400px;
+}
+
+/* Modal header with title and close button */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #ff6b35;  /* Orange accent for modal titles */
+}
+
+/* Close button (X) */
+.modal-close {
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    font-size: 28px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.modal-close:hover {
+    background: #3a3a3a;
+}
+
+/* ============================================================================
+ * FAVORITES LIST
+ * ============================================================================ */
+
+.favorites-container {
+    background: #252525;
+    border-radius: 8px;
+    border: 1px solid #3a3a3a;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    max-height: 200px;
+    flex-shrink: 0;
+}
+
+.favorites-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #1a1a1a;
+    border-bottom: 1px solid #3a3a3a;
+    font-size: 13px;
+    font-weight: bold;
+    color: #ff6b35;
+}
+
+.favorites-list {
+    overflow-y: auto;
+    flex: 1;
+}
+
+.favorite-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #2a2a2a;
+    transition: background 0.15s;
+    font-size: 13px;
+}
+
+.favorite-item:hover {
+    background: #2d2d2d;
+}
+
+.favorite-item:last-child {
+    border-bottom: none;
+}
+
+.favorite-item.playing {
+    background: #2a1a0a;
+    color: #ff6b35;
+}
+
+.favorite-item-number {
+    font-size: 11px;
+    color: #555;
+    min-width: 18px;
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.favorite-item.playing .favorite-item-number {
+    color: #ff6b35;
+}
+
+.favorite-item-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #e0e0e0;
+}
+
+.favorite-item-collection {
+    font-size: 11px;
+    color: #666;
+    flex-shrink: 0;
+}
+
+.empty-favorites {
+    padding: 12px;
+    text-align: center;
+    color: #555;
+    font-size: 12px;
+}
+
+/* Modal body content */
+.modal-body {
+    padding: 20px;
+}
+
+/* Help info section */
+.help-info {
+    margin-bottom: 20px;
+}
+
+.help-info h3 {
+    margin: 0 0 10px 0;
+    color: #ff6b35;
+    font-size: 18px;
+}
+
+.help-info p {
+    margin: 10px 0;
+    color: #e0e0e0;
+    line-height: 1.5;
+}
+
+.help-info ul {
+    margin: 10px 0;
+    padding-left: 20px;
+    color: #e0e0e0;
+}
+
+.help-info li {
+    margin: 5px 0;
+}
+
+.help-info .learn-more {
+    margin-top: 15px;
+}
+
+.help-info .learn-more a {
+    color: #ff6b35;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.help-info .learn-more a:hover {
+    text-decoration: underline;
+}
+
+/* Modal footer with action buttons */
+.modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    padding: 20px;
+    border-top: 1px solid #3a3a3a;
+}
+
+/* Form group container */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #b0b0b0;
+    font-size: 14px;
+}
+
+/* File info display box */
+.file-info {
+    background: #1a1a1a;
+    padding: 10px;
+    border-radius: 6px;
+    color: #e0e0e0;
+    font-size: 14px;
+}
+
+/* Form inputs and selects */
+.form-select,
+.form-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    background: #1a1a1a;
+    color: #e0e0e0;
+    font-size: 14px;
+    outline: none;
+}
+
+/* Focus state - orange border */
+.form-select:focus,
+.form-input:focus {
+    border-color: #ff6b35;  /* Orange accent on focus */
+}
+
+.form-select option {
+    background: #2d2d2d;
+    color: #e0e0e0;
+}
+
+/* Path selector with browse button */
+.path-selector {
+    display: flex;
+    gap: 10px;
+}
+
+.path-selector .form-input {
+    flex: 1;
+}
+
+/* Browse button for file selection */
+.browse-btn {
+    padding: 10px 15px;
+    border: 1px solid #3a3a3a;
+    border-radius: 6px;
+    background: #3a3a3a;
+    color: #e0e0e0;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.browse-btn:hover {
+    background: #4a4a4a;
+}
+
+/* Modal action buttons */
+.modal-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+/* Primary action button - orange */
+.modal-btn.primary {
+    background: #ff6b35;
+    color: white;
+}
+
+.modal-btn.primary:hover {
+    background: #ff8555;
+}
+
+/* Secondary action button - gray */
+.modal-btn.secondary {
+    background: #3a3a3a;
+    color: #e0e0e0;
+}
+
+.modal-btn.secondary:hover {
+    background: #4a4a4a;
+}
+
+/* ============================================================================
+ * PROGRESS BAR (For conversion progress)
+ * ============================================================================ */
+
+.progress-container {
+    text-align: center;
+}
+
+/* Progress bar container */
+.progress-bar {
+    width: 100%;
+    height: 20px;
+    background: #1a1a1a;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+/* Progress fill - orange gradient */
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b35, #ff8555);  /* Orange gradient */
+    width: 0%;
+    transition: width 0.3s;
+}
+
+/* Progress percentage text */
+.progress-text {
+    color: #e0e0e0;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* ============================================================================
+ * HELP BUTTON AND MODAL CONTENT
+ * ============================================================================ */
+
+.help-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid #3a3a3a;
+    background: #3a3a3a;
+    color: #e0e0e0;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.help-btn:hover {
+    background: #4a4a4a;
+    border-color: #ff6b35;  /* Orange border on hover */
+}
+
+/* Help info section in modal */
+.help-info {
+    background: #1a1a1a;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.help-info h3 {
+    color: #ff6b35;  /* Orange accent for section title */
+    margin-bottom: 10px;
+}
+
+.help-info p {
+    color: #b0b0b0;
+    margin-bottom: 10px;
+}
+
+.help-info ul {
+    color: #b0b0b0;
+    padding-left: 20px;
+}
+
+.help-info li {
+    margin-bottom: 5px;
+}
+
+/* ============================================================================
+ * EQUALIZER MODAL
+ * ============================================================================ */
+
+.eq-modal-content {
+    width: 380px;
+    max-width: 95vw;
+}
+
+.eq-presets {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.eq-preset-btn {
+    flex: 1;
+    min-width: 58px;
+    padding: 6px 8px;
+    border: 1px solid #3a3a3a;
+    border-radius: 16px;
+    background: #2d2d2d;
+    color: #bbb;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.eq-preset-btn:hover {
+    background: #3a3a3a;
+    color: #e0e0e0;
+}
+
+.eq-preset-btn.active {
+    background: #ff6b35;
+    border-color: #ff6b35;
+    color: #fff;
+}
+
+.eq-bands {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    gap: 8px;
+    padding: 10px 0;
+}
+
+.eq-band {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.eq-band-value {
+    font-size: 11px;
+    color: #ff6b35;
+    font-weight: bold;
+    min-width: 28px;
+    text-align: center;
+}
+
+.eq-slider {
+    -webkit-appearance: slider-vertical;
+    width: 28px;
+    height: 120px;
+    cursor: pointer;
+    accent-color: #ff6b35;
+}
+
+.eq-band-label {
+    font-size: 10px;
+    color: #888;
+}
+
+/* Body when window is maximized - remove rounded corners */
+body.maximized {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+}
+
+html.maximized {
+    border-radius: 0;
+}
+
+body.maximized .drag-strip {
+    border-radius: 0;
+}
