@@ -2515,7 +2515,8 @@ async function saveState() {
                 artist: t.artist,
                 album: t.album,
                 duration: t.duration,
-                coverPath: t.coverPath || null
+                coverPath: t.coverPath || null,
+                recordingDuration: t.recordingDuration || null  // Preserve recording duration for WebM files
             }))
         })),
         favorites: [...favorites],
@@ -2535,7 +2536,10 @@ async function loadState() {
     if (Array.isArray(state.collections)) {
         collections = state.collections.map(col => ({
             name: col.name,
-            playlist: col.playlist || []
+            playlist: (col.playlist || []).map(t => ({
+                ...t,
+                recordingDuration: t.recordingDuration || null  // Restore recording duration for WebM files
+            }))
         }));
         renderCollections();
     }
