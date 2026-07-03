@@ -384,6 +384,64 @@ ipcMain.handle('select-save-path', async () => {
     return null;  // Return null if canceled
 });
 
+// IPC handler for saving audio recording
+// CRITICAL: DO NOT MODIFY THIS IPC HANDLER
+// This handler saves recorded audio files to disk using the file dialog.
+// Parameters: filename (suggested filename), base64Data (audio data in base64)
+// Returns: Object with success flag and filePath or error
+// Any changes may break the file saving functionality.
+ipcMain.handle('save-recording', async (event, filename, base64Data) => {
+    try {
+        const result = await dialog.showSaveDialog(mainWindow, {
+            title: 'Guardar Grabación',
+            defaultPath: filename,
+            filters: [
+                { name: 'Audio WebM', extensions: ['webm'] },
+                { name: 'Todos los archivos', extensions: ['*'] }
+            ]
+        });
+
+        if (!result.canceled && result.filePath) {
+            // Convert base64 back to buffer and save
+            const buffer = Buffer.from(base64Data, 'base64');
+            fs.writeFileSync(result.filePath, buffer);
+            return { success: true, filePath: result.filePath };
+        }
+
+        return { success: false, error: 'User canceled' };
+    } catch (err) {
+        console.error('Error saving recording:', err);
+        return { success: false, error: err.message };
+    }
+});
+
+// IPC handler for getting audio duration using FFmpeg
+// Parameters: filePath (path to audio file)
+// Returns: Object with duration in seconds
+ipcMain.handle('get-audio-duration', async (event, filePath) => {
+    try {
+        const ffmpeg = require('fluent-ffmpeg');
+        console.log('Getting duration for file:', filePath);
+        return new Promise((resolve, reject) => {
+            ffmpeg(filePath)
+                .ffprobe((err, metadata) => {
+                    if (err) {
+                        console.error('FFprobe error:', err);
+                        reject(err);
+                    } else {
+                        console.log('FFprobe metadata:', JSON.stringify(metadata.format, null, 2));
+                        const duration = metadata.format.duration;
+                        console.log('Duration from FFprobe:', duration);
+                        resolve({ duration: duration });
+                    }
+                });
+        });
+    } catch (err) {
+        console.error('Error getting audio duration:', err);
+        return { duration: null };
+    }
+});
+
 // ============================================================================
 // AUDIO CONVERSION HANDLER (FFmpeg)
 // ============================================================================

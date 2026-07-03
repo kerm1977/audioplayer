@@ -510,6 +510,18 @@ body {
     transform: scale(1.05);  /* Slight scale up on hover */
 }
 
+/* Disabled state for control buttons */
+.control-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    background: #2a2a2a;
+}
+
+.control-btn:disabled:hover {
+    transform: none;
+    background: #2a2a2a;
+}
+
 /* Active state for shuffle/repeat buttons - orange highlight */
 .control-btn.active {
     color: #ff6b35;
@@ -518,6 +530,26 @@ body {
 
 .control-btn.active svg {
     fill: #ff6b35;  /* Orange fill for active state */
+}
+
+/* Recording state - red highlight with pulsing animation */
+.control-btn.recording {
+    color: #ff0000;
+    background: #2a2a2a;
+    animation: pulse 1.5s infinite;
+}
+
+.control-btn.recording svg {
+    fill: #ff0000;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
 }
 
 .control-btn:active {

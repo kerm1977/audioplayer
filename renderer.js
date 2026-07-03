@@ -45,6 +45,25 @@ let isRepeat = false;  // Boolean - true if repeat mode is enabled (loop current
 let currentLanguage = 'es';  // String - current UI language code (es, en, pt, fr, de, it, ru, zh, ja)
 
 // ============================================================================
+// GLOBAL VARIABLES - AUDIO RECORDING
+// ============================================================================
+// CRITICAL: DO NOT MODIFY THESE VARIABLES OR RECORDING LOGIC
+// These parameters are essential for the recording feature to work correctly.
+// Any changes may break the recording functionality, duration calculation,
+// or microphone volume control. The recording system has been carefully
+// configured and tested. Modifications are strictly prohibited.
+
+let isRecording = false;  // Boolean - true if audio recording is in progress
+let mediaRecorder = null;  // MediaRecorder instance for audio recording
+let recordedChunks = [];  // Array to store recorded audio chunks
+let audioStream = null;  // Audio stream from microphone or other input device
+let microphoneSource = null;  // Audio source node for microphone
+let microphoneAnalyser = null;  // Analyser node for microphone visualization
+let microphoneGain = null;  // Gain node for microphone volume control
+let recordingStartTime = null;  // Timestamp when recording started
+let recordingEndTime = null;  // Timestamp when recording stopped
+
+// ============================================================================
 // GLOBAL VARIABLES - CROSSFADE SYSTEM
 // ============================================================================
 
@@ -62,10 +81,10 @@ let isCrossfading = false;   // Boolean - true if crossfade between tracks is in
 let coverArt, trackTitle, trackArtist, trackAlbum, seekSlider, currentTimeEl, totalTimeEl;
 
 // Control buttons - playback controls
-let playBtn, pauseBtn, stopBtn, previousBtn, nextBtn, shuffleBtn, repeatBtn;
+let playBtn, pauseBtn, stopBtn, previousBtn, nextBtn, shuffleBtn, repeatBtn, recordBtn;
 
 // Volume and playlist UI elements
-let volumeSlider, collectionsEl, playlistEl, playlistHeader;
+let volumeSlider, micVolumeSlider, micVolumeContainer, collectionsEl, playlistEl, playlistHeader;
 
 // Visualizer canvas for spectrum display
 let visualizerCanvas, canvasCtx;
@@ -154,9 +173,12 @@ function initDOMElements() {
     nextBtn = document.getElementById('nextBtn');
     shuffleBtn = document.getElementById('shuffleBtn');
     repeatBtn = document.getElementById('repeatBtn');
+    recordBtn = document.getElementById('recordBtn');
 
     // Volume and playlist UI elements
     volumeSlider = document.getElementById('volumeSlider');
+    micVolumeSlider = document.getElementById('micVolumeSlider');
+    micVolumeContainer = document.getElementById('micVolumeContainer');
     collectionsEl = document.getElementById('collections');
     playlistEl = document.getElementById('playlist');
     playlistHeader = document.querySelector('.playlist-header');
@@ -326,6 +348,32 @@ function initEventListeners() {
         }
     });
 
+    // Microphone volume slider - adjusts microphone input level during recording
+    // CRITICAL: DO NOT MODIFY THIS VOLUME CONTROL LOGIC
+    // The microphone volume slider controls the gain node in the recording chain.
+    // Both input event (drag) and wheel event (scroll) are implemented for usability.
+    // Any changes may break microphone volume control during recording.
+    if (micVolumeSlider) {
+        micVolumeSlider.addEventListener('input', () => {
+            if (microphoneGain) {
+                const volume = micVolumeSlider.value / 100;
+                microphoneGain.gain.value = volume;
+            }
+        });
+
+        // Scroll wheel to adjust microphone volume
+        micVolumeSlider.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const delta = e.deltaY > 0 ? -5 : 5;  // Scroll down = volume down, scroll up = volume up
+            const newValue = Math.max(0, Math.min(100, parseInt(micVolumeSlider.value) + delta));
+            micVolumeSlider.value = newValue;
+            if (microphoneGain) {
+                const volume = newValue / 100;
+                microphoneGain.gain.value = volume;
+            }
+        });
+    }
+
     // Volume icon mute/unmute toggle
     document.getElementById('volumeIcon').addEventListener('click', () => {
         if (isMuted) {
@@ -438,6 +486,25 @@ function initEventListeners() {
         isRepeat = !isRepeat;
         repeatBtn.classList.toggle('active', isRepeat);
     });
+
+    // Record button - starts/stops audio recording
+    if (recordBtn) {
+        recordBtn.addEventListener('click', () => {
+            if (isPlaying) {
+                document.getElementById('recordingAlertModal').style.display = 'flex';
+                return;
+            }
+            toggleRecording();
+        });
+    }
+
+    // Recording alert modal close button
+    const closeRecordingAlert = document.getElementById('closeRecordingAlert');
+    if (closeRecordingAlert) {
+        closeRecordingAlert.addEventListener('click', () => {
+            document.getElementById('recordingAlertModal').style.display = 'none';
+        });
+    }
 
     // Context menu handlers
     document.getElementById('contextPlay').addEventListener('click', () => {
@@ -856,14 +923,16 @@ function initAudio() {
 function setupVisualizer() {
     visualizerCanvas.width = visualizerCanvas.offsetWidth;
     visualizerCanvas.height = visualizerCanvas.offsetHeight;
-    
+
     const bufferLength = analyser.frequencyBinCount;
     const dataArray = new Uint8Array(bufferLength);
-    
+
     function draw() {
         requestAnimationFrame(draw);  // Request next frame
 
-        analyser.getByteFrequencyData(dataArray);  // Get frequency data (0-255)
+        // Use microphone analyser when recording, otherwise use playback analyser
+        const currentAnalyser = isRecording && microphoneAnalyser ? microphoneAnalyser : analyser;
+        currentAnalyser.getByteFrequencyData(dataArray);  // Get frequency data (0-255)
 
         // Clear canvas with background color
         canvasCtx.fillStyle = '#1a1a1a';
@@ -899,7 +968,7 @@ function setupVisualizer() {
 
 // Format seconds to MM:SS format
 function formatTime(seconds) {
-    if (isNaN(seconds)) return '00:00';
+    if (isNaN(seconds) || !isFinite(seconds)) return '00:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
@@ -1100,6 +1169,14 @@ function playTrack(index) {
 
     audioElement1.play();                        // Start playback
     isPlaying = true;                            // Update playing state
+
+    // If this is a recording with stored duration, use it for seek slider
+    if (track.recordingDuration) {
+        setTimeout(() => {
+            seekSlider.max = track.recordingDuration;
+            totalTimeEl.textContent = formatTime(track.recordingDuration);
+        }, 100);
+    }
 
     updatePlayPauseButtons();    // Update button visibility (show pause, hide play)
     updateTrackInfo(track);      // Display track information (title, artist, album)
@@ -1604,6 +1681,191 @@ function toggleCollectionsCollapse() {
     if (collectionsEl && collapseBtn) {
         collectionsEl.classList.toggle('collapsed');
         collapseBtn.classList.toggle('collapsed');
+    }
+}
+
+// Toggle audio recording on/off
+// CRITICAL: DO NOT MODIFY THIS FUNCTION OR ITS LOGIC
+// This function handles the complete recording workflow including:
+// - Microphone access and stream initialization
+// - Audio context setup with separate microphone context
+// - MediaRecorder configuration with gain node for volume control
+// - Recording start/stop with timestamp tracking
+// - Playback control button disable/enable
+// - Microphone volume slider show/hide
+// - File saving and collection management
+// - Duration calculation using timestamps
+// Any modifications may break the recording feature completely.
+async function toggleRecording() {
+    if (!isRecording) {
+        // Start recording
+        try {
+            // Request access to audio input devices (microphone, webcam, mixer, USB, jack)
+            audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+            // Connect microphone to audio context for visualization
+            // Use a separate audio context for microphone to avoid interference with playback
+            const microphoneContext = new (window.AudioContext || window.webkitAudioContext)();
+            microphoneSource = microphoneContext.createMediaStreamSource(audioStream);
+            microphoneGain = microphoneContext.createGain();
+            microphoneAnalyser = microphoneContext.createAnalyser();
+            microphoneAnalyser.fftSize = 256;
+
+            // Connect source -> gain -> analyser
+            microphoneSource.connect(microphoneGain);
+            microphoneGain.connect(microphoneAnalyser);
+
+            // Also connect gain to destination for recording with volume control
+            // Create a destination node for recording
+            const destination = microphoneContext.createMediaStreamDestination();
+            microphoneGain.connect(destination);
+
+            // Use the stream from destination for recording (with volume control)
+            const recordingStream = destination.stream;
+            mediaRecorder = new MediaRecorder(recordingStream);
+            recordedChunks = [];
+
+            // Handle data available event
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+
+            // Handle recording stop event
+            mediaRecorder.onstop = async () => {
+                // Disconnect microphone from audio context
+                if (microphoneSource) {
+                    microphoneSource.disconnect();
+                    microphoneSource = null;
+                }
+                if (microphoneAnalyser) {
+                    microphoneAnalyser.disconnect();
+                    microphoneAnalyser = null;
+                }
+
+                // Create blob from recorded chunks
+                const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+
+                // Generate filename with timestamp
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                const filename = `grabacion-${timestamp}.webm`;
+
+                // Convert blob to base64 for IPC transfer
+                const arrayBuffer = await blob.arrayBuffer();
+                const base64Data = Buffer.from(arrayBuffer).toString('base64');
+
+                // Request save dialog via IPC
+                const result = await ipcRenderer.invoke('save-recording', filename, base64Data);
+
+                if (result.success) {
+                    console.log('Recording saved to:', result.filePath);
+
+                    // CRITICAL: DO NOT MODIFY THIS COLLECTION MANAGEMENT LOGIC
+                    // This code ensures recordings are saved to "Mis Grabaciones" collection.
+                    // Duration is calculated from timestamps to avoid WebM metadata issues.
+                    // recordingDurationSeconds is stored for seek slider compatibility.
+                    // Any changes may break collection management or duration display.
+
+                    // Use the actual saved file path to get the real filename
+                    const savedFileName = result.filePath.split('/').pop();
+
+                    // Create or find "Mis Grabaciones" collection
+                    let recordingsCollectionIndex = collections.findIndex(c => c.name === 'Mis Grabaciones');
+                    if (recordingsCollectionIndex === -1) {
+                        collections.push({
+                            name: 'Mis Grabaciones',
+                            playlist: []
+                        });
+                        recordingsCollectionIndex = collections.length - 1;
+                    }
+
+                    // Get duration for recorded file using recording time
+                    let duration = '00:00';
+                    let recordingDurationSeconds = 0;
+                    if (recordingStartTime && recordingEndTime) {
+                        recordingDurationSeconds = (recordingEndTime - recordingStartTime) / 1000;
+                        duration = formatTime(recordingDurationSeconds);
+                        console.log('Recording duration from timestamps:', duration, 'seconds:', recordingDurationSeconds);
+                    } else {
+                        console.log('Recording timestamps not available, duration will be 00:00');
+                    }
+
+                    // Add recording to collection
+                    const track = {
+                        path: result.filePath,
+                        fileName: savedFileName,
+                        title: savedFileName.replace(/\.[^/.]+$/, ''),
+                        artist: '',
+                        album: '',
+                        duration: duration,
+                        recordingDuration: recordingDurationSeconds  // Store actual duration in seconds for seek slider
+                    };
+                    collections[recordingsCollectionIndex].playlist.push(track);
+
+                    // Render collections and switch to recordings collection
+                    renderCollections();
+                    selectCollection(recordingsCollectionIndex);
+                } else {
+                    console.error('Error saving recording:', result.error);
+                }
+
+                // Stop all audio tracks
+                if (audioStream) {
+                    audioStream.getTracks().forEach(track => track.stop());
+                }
+            };
+
+            // Start recording
+            mediaRecorder.start();
+            isRecording = true;
+            recordBtn.classList.add('recording');
+
+            // Record start time for duration calculation
+            recordingStartTime = Date.now();
+
+            // Disable playback control buttons during recording
+            if (playBtn) playBtn.disabled = true;
+            if (pauseBtn) pauseBtn.disabled = true;
+            if (stopBtn) stopBtn.disabled = true;
+            if (previousBtn) previousBtn.disabled = true;
+            if (nextBtn) nextBtn.disabled = true;
+            if (shuffleBtn) shuffleBtn.disabled = true;
+            if (repeatBtn) repeatBtn.disabled = true;
+
+            // Show microphone volume slider
+            if (micVolumeContainer) micVolumeContainer.style.display = 'flex';
+
+            console.log('Recording started');
+
+        } catch (err) {
+            console.error('Error starting recording:', err);
+            alert('Error al iniciar la grabación. Asegúrate de tener un dispositivo de audio conectado.');
+        }
+    } else {
+        // Stop recording
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+            // Record end time for duration calculation
+            recordingEndTime = Date.now();
+
+            mediaRecorder.stop();
+            isRecording = false;
+            recordBtn.classList.remove('recording');
+
+            // Re-enable playback control buttons after recording
+            if (playBtn) playBtn.disabled = false;
+            if (pauseBtn) pauseBtn.disabled = false;
+            if (stopBtn) stopBtn.disabled = false;
+            if (previousBtn) previousBtn.disabled = false;
+            if (nextBtn) nextBtn.disabled = false;
+            if (shuffleBtn) shuffleBtn.disabled = false;
+            if (repeatBtn) repeatBtn.disabled = false;
+
+            // Hide microphone volume slider
+            if (micVolumeContainer) micVolumeContainer.style.display = 'none';
+
+            console.log('Recording stopped');
+        }
     }
 }
 
