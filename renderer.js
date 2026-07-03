@@ -170,6 +170,9 @@ function initDOMElements() {
     addFolderBtn = document.getElementById('addFolderBtn');
     editMetadataBtn = document.getElementById('editMetadataBtn');
 
+    // Collapse button for collections
+    const collapseCollectionsBtn = document.getElementById('collapseCollectionsBtn');
+
     // Ensure addFilesBtn is always enabled
     if (addFilesBtn) {
         addFilesBtn.disabled = false;
@@ -178,6 +181,11 @@ function initDOMElements() {
     if (addFolderBtn) {
         addFolderBtn.disabled = false;
         addFolderBtn.style.opacity = '1';
+    }
+
+    // Add collapse button listener
+    if (collapseCollectionsBtn) {
+        collapseCollectionsBtn.addEventListener('click', toggleCollectionsCollapse);
     }
 
     // Language selector dropdown for UI translation
@@ -277,11 +285,38 @@ function initEventListeners() {
         audioElement1.currentTime = seekSlider.value;  // Set current time to slider value
     });
 
+    // Seek slider - scroll wheel to seek
+    seekSlider.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -5 : 5;  // Scroll down = seek back, scroll up = seek forward
+        const newValue = Math.max(0, Math.min(seekSlider.max, parseFloat(seekSlider.value) + delta));
+        seekSlider.value = newValue;
+        audioElement1.currentTime = newValue;
+    });
+
     // Volume slider - adjusts playback volume (0-100 range)
     volumeSlider.addEventListener('input', () => {
         const volume = volumeSlider.value / 100;  // Convert 0-100 to 0.0-1.0
         gainNode1.gain.value = volume;  // Set volume for current track
         gainNode2.gain.value = isCrossfading ? volume : 0;  // Set volume for crossfade track
+        if (volume > 0 && isMuted) {
+            isMuted = false;
+            document.getElementById('volumeIconPath').setAttribute('d',
+                'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z'
+            );
+            document.getElementById('volumeIcon').style.color = '';
+        }
+    });
+
+    // Volume slider - scroll wheel to adjust volume
+    volumeSlider.addEventListener('wheel', (e) => {
+        e.preventDefault();
+        const delta = e.deltaY > 0 ? -5 : 5;  // Scroll down = volume down, scroll up = volume up
+        const newValue = Math.max(0, Math.min(100, parseInt(volumeSlider.value) + delta));
+        volumeSlider.value = newValue;
+        const volume = newValue / 100;
+        gainNode1.gain.value = volume;
+        gainNode2.gain.value = isCrossfading ? volume : 0;
         if (volume > 0 && isMuted) {
             isMuted = false;
             document.getElementById('volumeIconPath').setAttribute('d',
@@ -1522,9 +1557,13 @@ function renderFavorites() {
         favoritesList.innerHTML = '';  // Clear favorites list
         let favNumber = 0;  // Counter for favorite numbering
         // Collect all favorited tracks across all collections
+        // Use a Set to avoid duplicates based on file path
+        const seenPaths = new Set();
         collections.forEach((collection, collectionIndex) => {
             collection.playlist.forEach((track, trackIndex) => {
                 if (!favorites.has(track.path)) return;
+                if (seenPaths.has(track.path)) return;  // Skip duplicates
+                seenPaths.add(track.path);
                 favNumber++;
                 const item = document.createElement('div');
                 item.className = 'favorite-item';
@@ -1556,6 +1595,16 @@ function updateCounters() {
     const playlistCountEl = document.getElementById('playlistCount');
     if (favCountEl) favCountEl.textContent = favorites.size;
     if (playlistCountEl) playlistCountEl.textContent = playlist.length;
+}
+
+// Toggle collections collapse/expand
+function toggleCollectionsCollapse() {
+    const collectionsEl = document.getElementById('collections');
+    const collapseBtn = document.getElementById('collapseCollectionsBtn');
+    if (collectionsEl && collapseBtn) {
+        collectionsEl.classList.toggle('collapsed');
+        collapseBtn.classList.toggle('collapsed');
+    }
 }
 
 // Play a file from its file path (when opened via double-click on file)
@@ -1638,14 +1687,16 @@ function playFavoritesOnly() {
     }
 
     // Collect all favorited tracks across all collections
-    const favTracks = [];
+    // Use a Set to avoid duplicates based on file path
+    const favTracksMap = new Map();
     collections.forEach(collection => {
         collection.playlist.forEach(track => {
-            if (favorites.has(track.path)) {
-                favTracks.push(track);
+            if (favorites.has(track.path) && !favTracksMap.has(track.path)) {
+                favTracksMap.set(track.path, track);
             }
         });
     });
+    const favTracks = Array.from(favTracksMap.values());
 
     if (favTracks.length === 0) return;
 

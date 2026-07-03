@@ -1,19 +1,36 @@
 /* ============================================================================
- * AUDIO PLAYER ELECTRON - STYLES
+ * AUDIO PLAYER ELECTRON - STYLESHEET
  * ============================================================================
  * This file contains all CSS styling for the audio player application.
- * Theme: Dark with orange accent (#ff6b35)
- * Layout: Grid-based with playlist on left, player on right, actions at bottom
+ * 
+ * Theme: Dark gradient background with orange accent (#ff6b35)
+ * Layout: CSS Grid with 2-column layout (collections/playlist left, player right)
+ * Typography: Segoe UI, Tahoma, Geneva, Verdana, sans-serif
+ * 
+ * Key Styling Sections:
+ * - Reset and base styles
+ * - Drag strip (custom title bar for frameless window)
+ * - Search bar
+ * - Main container (grid layout)
+ * - Collections and playlist
+ * - Player controls and visualizer
+ * - Modals (conversion, metadata, help, equalizer, exit)
+ * - Context menus
+ * - Form elements
  * ============================================================================ */
 
-/* Reset and base styles */
+/* ============================================================================
+ * RESET AND BASE STYLES
+ * ============================================================================ */
+
+/* Reset all margins and padding, set box-sizing to border-box */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* html - transparent base for rounded corners */
+/* html - transparent base for rounded corners on frameless window */
 html {
     border-radius: 14px;
     overflow: hidden;
@@ -35,14 +52,18 @@ body {
 }
 
 /* ============================================================================
- * SEARCH BAR
- * ============================================================================ */
+ * DRAG STRIP - Custom Title Bar
+ * ============================================================================
+ * This thin strip at the top serves as the window title bar for the frameless window.
+ * Has -webkit-app-region: drag to allow window dragging.
+ * Contains window title on the left and window controls (minimize, maximize, close) on the right.
+ */
 
 /* Thin drag strip at the very top - also hosts window control buttons */
 .drag-strip {
     height: 28px;
     background: #1a1a1a;
-    -webkit-app-region: drag;
+    -webkit-app-region: drag;  /* Allows window to be dragged by this area */
     flex-shrink: 0;
     border-radius: 14px 14px 0 0;
     display: flex;
@@ -51,9 +72,17 @@ body {
     padding: 0 10px;
 }
 
+/* Window controls container - disable drag region for buttons to be clickable */
 .drag-strip .window-controls {
-    -webkit-app-region: no-drag;
+    -webkit-app-region: no-drag;  /* Buttons must be clickable, not draggable */
 }
+
+/* ============================================================================
+ * SEARCH BAR
+ * ============================================================================
+ * Search input field for filtering tracks across all collections.
+ * Also serves as a drag region for the frameless window.
+ */
 
 /* Search bar container - drag region for frameless window */
 .search-bar-container {
@@ -67,14 +96,21 @@ body {
     -webkit-app-region: drag;   /* Make this area draggable */
 }
 
-/* Non-draggable elements inside drag region */
+/* Non-draggable elements inside drag region - must be clickable */
 .search-bar-container input,
 .search-bar-container button,
 .search-bar-container .search-info {
     -webkit-app-region: no-drag;
 }
 
-/* Custom window control buttons */
+/* ============================================================================
+ * WINDOW CONTROLS
+ * ============================================================================
+ * Custom window control buttons (minimize, maximize, close) for frameless window.
+ * macOS-style circular buttons with color coding (yellow, green, red).
+ */
+
+/* Window title text - centered in drag strip */
 .window-title {
     flex: 1;
     font-size: 12px;
@@ -85,6 +121,7 @@ body {
     user-select: none;
 }
 
+/* Window controls container - holds minimize, maximize, close buttons */
 .window-controls {
     display: flex;
     gap: 6px;
@@ -92,6 +129,7 @@ body {
     margin-left: 4px;
 }
 
+/* Window control buttons - macOS-style circular buttons */
 .win-btn {
     width: 14px;
     height: 14px;
@@ -179,7 +217,12 @@ body {
 
 /* ============================================================================
  * MAIN LAYOUT - CSS GRID
- * ============================================================================ */
+ * ============================================================================
+ * Two-column grid layout:
+ * - Left column: Collections list and Playlist
+ * - Right column: Player controls, visualizer, and action buttons
+ * - Bottom row: Action buttons (spans both columns)
+ */
 
 /* Main container - 2-column grid layout */
 .container {
@@ -194,7 +237,7 @@ body {
     box-sizing: border-box;
 }
 
-/* Playlist container - left column */
+/* Playlist container - left column (collections + playlist) */
 .playlist-container {
     grid-column: 1;
     grid-row: 1;
@@ -204,7 +247,7 @@ body {
     flex-direction: column;
 }
 
-/* Player container - right column */
+/* Player container - right column (controls, visualizer, favorites) */
 .player-container {
     grid-column: 2;
     grid-row: 1;
@@ -218,14 +261,17 @@ body {
 
 /* Actions bar - spans both columns at bottom, never hidden */
 .actions {
-    grid-column: 1 / -1;
+    grid-column: 1 / -1;  /* Span from first to last column */
     grid-row: 2;
     flex-shrink: 0;
 }
 
 /* ============================================================================
  * PLAYER HEADER (Cover Art + Track Info)
- * ============================================================================ */
+ * ============================================================================
+ * Displays album cover art and track metadata (title, artist, album, favorite).
+ * Clicking cover art allows changing the album image.
+ */
 
 .header {
     display: flex;
@@ -237,7 +283,7 @@ body {
     border: 1px solid #3a3a3a;
 }
 
-/* Album art display */
+/* Album art display - shows embedded artwork or placeholder */
 .cover-art {
     width: 120px;
     height: 120px;
@@ -248,15 +294,16 @@ body {
     justify-content: center;
     overflow: hidden;
     border: 2px solid #3a3a3a;
-    cursor: pointer;
+    cursor: pointer;  /* Clickable to change cover art */
     position: relative;
     transition: border-color 0.2s;
 }
 
 .cover-art:hover {
-    border-color: #ff6b35;
+    border-color: #ff6b35;  /* Orange highlight on hover */
 }
 
+/* Overlay text shown on hover - prompts user to change cover art */
 .cover-art::after {
     content: '🖼 Cambiar';
     position: absolute;
@@ -272,9 +319,10 @@ body {
 }
 
 .cover-art:hover::after {
-    opacity: 1;
+    opacity: 1;  /* Show overlay on hover */
 }
 
+/* Cover art image - fills the container */
 .cover-art img {
     width: 100%;
     height: 100%;
@@ -288,7 +336,7 @@ body {
     text-align: center;
 }
 
-/* Track information container */
+/* Track information container - holds title, artist, album, favorite */
 .track-info {
     flex: 1;
     display: flex;
@@ -296,39 +344,40 @@ body {
     gap: 8px;
 }
 
-/* Track title - orange accent color */
+/* Track title - orange accent color for emphasis */
 .track-title {
     font-size: 20px;
     font-weight: bold;
     color: #ff6b35;  /* Primary orange accent */
 }
 
-/* Artist name */
+/* Artist name - secondary text color */
 .track-artist {
     font-size: 16px;
     color: #b0b0b0;
 }
 
-/* Album name */
+/* Album name - tertiary text color */
 .track-album {
     font-size: 14px;
     color: #888;
 }
 
-/* Favorite toggle */
+/* Favorite toggle - heart icon for favoriting tracks */
 .track-favorite {
     margin-top: 5px;
     display: flex;
     align-items: center;
 }
 
+/* Favorite heart icon - clickable with hover scale effect */
 .track-favorite-icon {
     cursor: pointer;
     transition: transform 0.2s;
 }
 
 .track-favorite-icon:hover {
-    transform: scale(1.1);
+    transform: scale(1.1);  /* Slight scale up on hover */
 }
 
 .track-favorite-icon svg {
@@ -337,7 +386,10 @@ body {
 
 /* ============================================================================
  * SPECTRUM VISUALIZER
- * ============================================================================ */
+ * ============================================================================
+ * Canvas-based audio spectrum visualizer using Web Audio API.
+ * Displays frequency bars that animate with music playback.
+ */
 
 .visualizer {
     height: 100px;
@@ -355,7 +407,10 @@ body {
 
 /* ============================================================================
  * SEEK SLIDER AND TIME DISPLAY
- * ============================================================================ */
+ * ============================================================================
+ * Seek slider allows user to jump to any position in the track.
+ * Time display shows current position and total duration.
+ */
 
 .seek-container {
     display: flex;
@@ -365,7 +420,7 @@ body {
 
 /* Seek slider - orange thumb for visual feedback */
 .seek-slider {
-    -webkit-appearance: none;
+    -webkit-appearance: none;  /* Remove default browser styling */
     width: 100%;
     height: 6px;
     border-radius: 3px;
@@ -416,6 +471,25 @@ body {
     border: 1px solid #3a3a3a;
 }
 
+/* ============================================================================
+ * PLAYBACK CONTROL BUTTONS
+ * ============================================================================
+ * Main playback controls: Shuffle, Previous, Play/Pause, Stop, Next, Repeat, Equalizer.
+ * Each button has hover effects and active states for visual feedback.
+ */
+
+/* Controls container - holds all playback buttons */
+.controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    padding: 10px;
+    background: #252525;
+    border-radius: 8px;
+    border: 1px solid #3a3a3a;
+}
+
 /* Control button base styling */
 .control-btn {
     width: 45px;
@@ -433,7 +507,7 @@ body {
 
 .control-btn:hover {
     background: #4a4a4a;
-    transform: scale(1.05);
+    transform: scale(1.05);  /* Slight scale up on hover */
 }
 
 /* Active state for shuffle/repeat buttons - orange highlight */
@@ -447,7 +521,7 @@ body {
 }
 
 .control-btn:active {
-    transform: scale(0.95);
+    transform: scale(0.95);  /* Slight scale down on click */
 }
 
 .control-btn svg {
@@ -467,7 +541,11 @@ body {
 
 /* ============================================================================
  * VOLUME CONTROL
- * ============================================================================ */
+ * ============================================================================
+ * Volume slider with icon that changes based on volume level.
+ * Clicking the icon mutes/unmutes the audio.
+ * Uses blue accent color (#4a90e2) to distinguish from orange playback controls.
+ */
 
 .volume-container {
     display: flex;
@@ -485,7 +563,7 @@ body {
 
 /* Volume slider - blue accent color (different from orange) */
 .volume-slider {
-    -webkit-appearance: none;
+    -webkit-appearance: none;  /* Remove default browser styling */
     flex: 1;
     height: 4px;
     border-radius: 2px;
@@ -509,7 +587,10 @@ body {
 
 /* ============================================================================
  * ACTION BUTTONS (Add Files, Add Folder, Edit Metadata)
- * ============================================================================ */
+ * ============================================================================
+ * Bottom row buttons for file operations and metadata editing.
+ * Spans both columns of the grid layout.
+ */
 
 .actions {
     display: flex;
@@ -674,7 +755,10 @@ body {
 
 /* ============================================================================
  * PLAYLIST STYLING
- * ============================================================================ */
+ * ============================================================================
+ * Collections list and playlist display in the left column.
+ * Includes custom scrollbars and item styling with hover effects.
+ */
 
 .playlist-container {
     display: flex;
@@ -686,7 +770,7 @@ body {
     max-height: 100%;
 }
 
-/* Playlist header text */
+/* Playlist header text - shows collection/playlist name and count */
 .playlist-header {
     padding: 12px 15px;
     background: #2d2d2d;
@@ -696,8 +780,45 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
 }
 
+/* Container for collections title and count to keep them together */
+.playlist-header-title-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Collapse button for collections */
+.collapse-btn {
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+.collapse-btn:hover {
+    background: #3a3a3a;
+    color: #fff;
+}
+
+.collapse-btn svg {
+    transition: transform 0.3s;
+}
+
+.collapse-btn.collapsed svg {
+    transform: rotate(-90deg);
+}
+
+/* Count badges - orange badges showing number of items */
 .playlist-count, .favorites-count {
     background: #ff6b35;
     color: #fff;
@@ -713,6 +834,15 @@ body {
     overflow-y: auto;
     padding: 5px;
     max-height: 40%;
+    transition: max-height 0.3s ease, flex 0.3s ease;
+}
+
+/* Collections collapsed state */
+.collections.collapsed {
+    max-height: 0;
+    flex: 0;
+    padding: 0;
+    overflow: hidden;
 }
 
 /* Custom scrollbar for collections */
@@ -894,6 +1024,13 @@ body {
     color: #666;
 }
 
+/* ============================================================================
+ * CUSTOM SCROLLBARS
+ * ============================================================================
+ * Custom scrollbar styling for WebKit browsers (Chrome, Edge, Safari).
+ * Dark theme with rounded thumb for better visual integration.
+ */
+
 /* Global scrollbar styling */
 ::-webkit-scrollbar {
     width: 8px;
@@ -914,7 +1051,10 @@ body {
 
 /* ============================================================================
  * CONTEXT MENU (Right-click on playlist items)
- * ============================================================================ */
+ * ============================================================================
+ * Custom context menu that appears when right-clicking on a track in the playlist.
+ * Provides options for: Play, Edit Metadata, Convert Audio, Remove.
+ */
 
 .context-menu {
     position: fixed;
@@ -953,8 +1093,11 @@ body {
 }
 
 /* ============================================================================
- * MODAL DIALOGS (Help, Conversion, Progress)
- * ============================================================================ */
+ * MODAL DIALOGS (Help, Conversion, Progress, Metadata, Equalizer, Exit)
+ * ============================================================================
+ * Modal dialogs for various application features.
+ * All modals share common styling with dark background and orange accents.
+ */
 
 .modal {
     position: fixed;
@@ -969,7 +1112,7 @@ body {
     z-index: 2000;
 }
 
-/* Modal content box */
+/* Modal content box - main container for modal content */
 .modal-content {
     background: #252525;
     border-radius: 12px;
@@ -980,7 +1123,7 @@ body {
     overflow-y: auto;
 }
 
-/* Smaller modal variant */
+/* Smaller modal variant - for progress dialogs */
 .modal-content.small {
     max-width: 400px;
 }
@@ -1000,7 +1143,7 @@ body {
     color: #ff6b35;  /* Orange accent for modal titles */
 }
 
-/* Close button (X) */
+/* Close button (X) - top right of modal */
 .modal-close {
     background: none;
     border: none;
@@ -1023,7 +1166,10 @@ body {
 
 /* ============================================================================
  * FAVORITES LIST
- * ============================================================================ */
+ * ============================================================================
+ * Displays all favorited tracks from all collections in the player container.
+ * Includes header with count and play favorites button.
+ */
 
 .favorites-container {
     background: #252525;
@@ -1110,12 +1256,19 @@ body {
     font-size: 12px;
 }
 
-/* Modal body content */
+/* ============================================================================
+ * FORM ELEMENTS
+ * ============================================================================
+ * Common form styling for inputs, selects, buttons, and labels.
+ * Used in modals for metadata editing, conversion settings, and language selection.
+ */
+
+/* Modal body content - main content area of modals */
 .modal-body {
     padding: 20px;
 }
 
-/* Help info section */
+/* Help info section - keyboard shortcuts and language selector */
 .help-info {
     margin-bottom: 20px;
 }
@@ -1156,7 +1309,7 @@ body {
     text-decoration: underline;
 }
 
-/* Modal footer with action buttons */
+/* Modal footer with action buttons - save/cancel buttons */
 .modal-footer {
     display: flex;
     justify-content: flex-end;
@@ -1165,7 +1318,7 @@ body {
     border-top: 1px solid #3a3a3a;
 }
 
-/* Form group container */
+/* Form group container - wraps label and input/select */
 .form-group {
     margin-bottom: 15px;
 }
@@ -1177,7 +1330,7 @@ body {
     font-size: 14px;
 }
 
-/* File info display box */
+/* File info display box - shows file path or format information */
 .file-info {
     background: #1a1a1a;
     padding: 10px;
@@ -1186,7 +1339,7 @@ body {
     font-size: 14px;
 }
 
-/* Form inputs and selects */
+/* Form inputs and selects - common styling for form elements */
 .form-select,
 .form-input {
     width: 100%;
@@ -1199,7 +1352,7 @@ body {
     outline: none;
 }
 
-/* Focus state - orange border */
+/* Focus state - orange border for visual feedback */
 .form-select:focus,
 .form-input:focus {
     border-color: #ff6b35;  /* Orange accent on focus */
@@ -1210,7 +1363,7 @@ body {
     color: #e0e0e0;
 }
 
-/* Path selector with browse button */
+/* Path selector with browse button - for file/folder selection */
 .path-selector {
     display: flex;
     gap: 10px;
@@ -1220,7 +1373,7 @@ body {
     flex: 1;
 }
 
-/* Browse button for file selection */
+/* Browse button for file selection - opens file dialog */
 .browse-btn {
     padding: 10px 15px;
     border: 1px solid #3a3a3a;
@@ -1235,7 +1388,14 @@ body {
     background: #4a4a4a;
 }
 
-/* Modal action buttons */
+/* ============================================================================
+ * MODAL ACTION BUTTONS
+ * ============================================================================
+ * Primary and secondary buttons for modal dialogs.
+ * Primary buttons use orange accent, secondary buttons use gray.
+ */
+
+/* Modal action buttons - common base styling */
 .modal-btn {
     padding: 10px 20px;
     border: none;
@@ -1245,17 +1405,17 @@ body {
     transition: all 0.2s;
 }
 
-/* Primary action button - orange */
+/* Primary action button - orange (save, confirm, convert) */
 .modal-btn.primary {
     background: #ff6b35;
     color: white;
 }
 
 .modal-btn.primary:hover {
-    background: #ff8555;
+    background: #ff8555;  /* Lighter orange on hover */
 }
 
-/* Secondary action button - gray */
+/* Secondary action button - gray (cancel, close) */
 .modal-btn.secondary {
     background: #3a3a3a;
     color: #e0e0e0;
@@ -1267,13 +1427,16 @@ body {
 
 /* ============================================================================
  * PROGRESS BAR (For conversion progress)
- * ============================================================================ */
+ * ============================================================================
+ * Progress bar displayed during audio conversion.
+ * Shows fill percentage with orange accent color.
+ */
 
 .progress-container {
     text-align: center;
 }
 
-/* Progress bar container */
+/* Progress bar container - outer track */
 .progress-bar {
     width: 100%;
     height: 20px;
@@ -1283,7 +1446,7 @@ body {
     margin-bottom: 10px;
 }
 
-/* Progress fill - orange gradient */
+/* Progress fill - orange gradient fill that animates */
 .progress-fill {
     height: 100%;
     background: linear-gradient(90deg, #ff6b35, #ff8555);  /* Orange gradient */
@@ -1291,7 +1454,7 @@ body {
     transition: width 0.3s;
 }
 
-/* Progress percentage text */
+/* Progress percentage text - shows completion percentage */
 .progress-text {
     color: #e0e0e0;
     font-size: 16px;
@@ -1351,13 +1514,17 @@ body {
 
 /* ============================================================================
  * EQUALIZER MODAL
- * ============================================================================ */
+ * ============================================================================
+ * 5-band audio equalizer with preset buttons.
+ * Vertical sliders for frequency bands (60Hz, 250Hz, 1kHz, 4kHz, 12kHz).
+ */
 
 .eq-modal-content {
     width: 380px;
     max-width: 95vw;
 }
 
+/* EQ preset buttons - quick configurations for different music genres */
 .eq-presets {
     display: flex;
     gap: 6px;
@@ -1384,11 +1551,12 @@ body {
 }
 
 .eq-preset-btn.active {
-    background: #ff6b35;
+    background: #ff6b35;  /* Orange accent for active preset */
     border-color: #ff6b35;
     color: #fff;
 }
 
+/* EQ bands container - holds 5 vertical sliders */
 .eq-bands {
     display: flex;
     justify-content: space-around;
@@ -1397,6 +1565,7 @@ body {
     padding: 10px 0;
 }
 
+/* Individual EQ band - value display, slider, and label */
 .eq-band {
     display: flex;
     flex-direction: column;
@@ -1404,6 +1573,7 @@ body {
     gap: 6px;
 }
 
+/* EQ band value display - shows current gain value in dB */
 .eq-band-value {
     font-size: 11px;
     color: #ff6b35;
@@ -1412,18 +1582,27 @@ body {
     text-align: center;
 }
 
+/* EQ slider - vertical orientation for frequency adjustment */
 .eq-slider {
-    -webkit-appearance: slider-vertical;
+    -webkit-appearance: slider-vertical;  /* Vertical slider for EQ */
     width: 28px;
     height: 120px;
     cursor: pointer;
-    accent-color: #ff6b35;
+    accent-color: #ff6b35;  /* Orange accent for slider thumb */
 }
 
+/* EQ band label - shows frequency (60Hz, 250Hz, etc.) */
 .eq-band-label {
     font-size: 10px;
     color: #888;
 }
+
+/* ============================================================================
+ * WINDOW STATES
+ * ============================================================================
+ * Styles for different window states (maximized, normal).
+ * Removes rounded corners when window is maximized.
+ */
 
 /* Body when window is maximized - remove rounded corners */
 body.maximized {
