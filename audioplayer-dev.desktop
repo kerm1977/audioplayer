@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=AudioPlayer (Dev)
+Comment=Reproductor de audio universal estilo AIMP - Development
+Exec=/home/pmint/CascadeProjects/AudioPlayerElectron/audioplayer-dev.sh %F
+Icon=/home/pmint/CascadeProjects/AudioPlayerElectron/assets/icon.png
+Terminal=false
+Type=Application
+Categories=Audio;AudioVideo;
+MimeType=audio/mpeg;audio/mp3;audio/wav;audio/ogg;audio/flac;audio/aac;audio/m4a;audio/wma;audio/opus;

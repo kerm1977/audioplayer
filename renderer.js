@@ -2,82 +2,142 @@
 // AUDIO PLAYER ELECTRON - RENDERER PROCESS
 // ============================================================================
 // This file handles all UI logic, audio playback, playlist management,
-// metadata extraction, and user interactions in the renderer process.
+// metadata extraction, favorites system, equalizer, and user interactions.
+// It runs in the renderer process (the browser window) and communicates
+// with the main process via IPC (Inter-Process Communication).
 // ============================================================================
 
+// Import Electron IPC module for communication with main process
 const { ipcRenderer } = require('electron');
+// Import Node.js path module for file path operations
 const path = require('path');
 
 // ============================================================================
-// GLOBAL VARIABLES
+// GLOBAL VARIABLES - AUDIO CONTEXT AND ELEMENTS
 // ============================================================================
 
-// Audio context and elements
-let audioContext;      // Web Audio API context for visualization
-let audioElement1;     // First HTML5 Audio element (current track)
-let audioElement2;     // Second HTML5 Audio element (next track for crossfade)
-let analyser;          // Audio analyser for spectrum visualization
-let source1;           // Media element source for first audio element
-let source2;           // Media element source for second audio element
-let gainNode1;         // Gain node for controlling volume of first track
-let gainNode2;         // Gain node for controlling volume of second track
-let collections = [];   // Array of collection objects (each with name and playlist)
-let currentCollectionIndex = -1;  // Index of currently selected collection
-let playlist = [];      // Current playlist (from selected collection)
-let currentTrackIndex = -1;  // Index of currently playing track
-let isPlaying = false;  // Playback state
-let isShuffle = false;  // Shuffle mode state
-let isRepeat = false;  // Repeat mode state
-let currentLanguage = 'es';  // Current UI language
-let crossfadeDuration = 3;   // Crossfade duration in seconds
-let isCrossfading = false;   // Track if crossfade is in progress
+// Web Audio API components for audio visualization and processing
+let audioContext;      // Web Audio API context - main audio processing environment
+let audioElement1;     // First HTML5 Audio element - plays current track
+let audioElement2;     // Second HTML5 Audio element - preloads next track for crossfade
+let analyser;          // Audio analyser node - provides frequency data for visualization
+let source1;           // Media element source - connects audioElement1 to Web Audio API
+let source2;           // Media element source - connects audioElement2 to Web Audio API
+let gainNode1;         // Gain node - controls volume of first track (for crossfade)
+let gainNode2;         // Gain node - controls volume of second track (for crossfade)
+
+// ============================================================================
+// GLOBAL VARIABLES - PLAYLIST AND COLLECTIONS
+// ============================================================================
+
+let collections = [];   // Array of collection objects - each has 'name' and 'playlist' array
+let currentCollectionIndex = -1;  // Index of currently selected collection in collections array
+let playlist = [];      // Current playlist - array of track objects from selected collection
+let currentTrackIndex = -1;  // Index of currently playing track in playlist array
+
+// ============================================================================
+// GLOBAL VARIABLES - PLAYBACK STATE
+// ============================================================================
+
+let isPlaying = false;  // Boolean - true if audio is currently playing
+let isShuffle = false;  // Boolean - true if shuffle mode is enabled (random track order)
+let isRepeat = false;  // Boolean - true if repeat mode is enabled (loop current track)
+let currentLanguage = 'es';  // String - current UI language code (es, en, pt, fr, de, it, ru, zh, ja)
+
+// ============================================================================
+// GLOBAL VARIABLES - CROSSFADE SYSTEM
+// ============================================================================
+
+let crossfadeDuration = 3;   // Number - crossfade duration in seconds (default 3 seconds)
+let isCrossfading = false;   // Boolean - true if crossfade between tracks is in progress
 
 // ============================================================================
 // DOM ELEMENT REFERENCES
 // ============================================================================
-// These will be initialized when DOM is ready
+// These variables hold references to HTML DOM elements.
+// They are initialized in initDOMElements() when the DOM is ready.
+// Using cached references improves performance vs. querying DOM repeatedly.
+
+// Player UI elements - display track information and cover art
 let coverArt, trackTitle, trackArtist, trackAlbum, seekSlider, currentTimeEl, totalTimeEl;
+
+// Control buttons - playback controls
 let playBtn, pauseBtn, stopBtn, previousBtn, nextBtn, shuffleBtn, repeatBtn;
+
+// Volume and playlist UI elements
 let volumeSlider, collectionsEl, playlistEl, playlistHeader;
+
+// Visualizer canvas for spectrum display
 let visualizerCanvas, canvasCtx;
+
+// Action buttons - file operations and metadata
 let addFilesBtn, addFolderBtn, editMetadataBtn;
+
+// Language selector dropdown
 let languageSelector;
+
+// Context menus - right-click menus for tracks and collections
 let contextMenu, collectionContextMenu;
+
+// Conversion modal elements - for audio conversion feature
 let conversionModal, progressModal, currentFileName, currentFormat, targetFormat, quality, outputPath, progressFill, progressText;
+
+// Help modal elements
 let helpModal, closeHelpModal, helpBtn, helpBtnTop;
+
+// Search elements
 let searchInput, searchInfo;
+
+// Favorites list element
 let favoritesList;
+
+// Favorite icon element (heart icon below album info)
 let favoriteIcon;
 
 // ============================================================================
 // FAVORITES SYSTEM
 // ============================================================================
-let favorites = new Set();  // Store file paths of favorite tracks (unique cross-collection identifier)
-let isPlayingFavorites = false;   // Whether favorites-only mode is active
-let favoritesQueue = [];          // Separate playback queue for favorites mode
-let favoritesQueueIndex = -1;     // Current position within favoritesQueue
+// The favorites system allows users to mark tracks as favorites across all collections.
+// Favorites are stored by file path (unique identifier) in a Set data structure.
+// This enables cross-collection favoriting - same file in different collections shares favorite status.
+
+let favorites = new Set();  // Set of file paths - stores paths of favorited tracks (unique, no duplicates)
+let isPlayingFavorites = false;   // Boolean - true when playing only favorites (favorites-only mode)
+let favoritesQueue = [];          // Array - playback queue for favorites mode (contains track objects)
+let favoritesQueueIndex = -1;     // Number - current position index within favoritesQueue
 
 // ============================================================================
-// EQUALIZER
+// EQUALIZER SYSTEM
 // ============================================================================
+// The equalizer uses Web Audio API BiquadFilterNode to adjust frequency bands.
+// Five frequency bands are used: 60Hz (bass), 250Hz (low-mids), 1kHz (mids), 4kHz (high-mids), 12kHz (treble).
+// Presets provide quick EQ configurations for different music genres.
+
+// Frequency bands for 5-band equalizer (in Hz)
 const EQ_FREQUENCIES = [60, 250, 1000, 4000, 12000];
+
+// EQ presets - gain values in dB for each frequency band
+// Order: [60Hz, 250Hz, 1kHz, 4kHz, 12kHz]
 const EQ_PRESETS = {
-    flat:     [0,  0,  0,  0,  0],
-    pop:      [2,  3,  0,  3,  2],
-    rock:     [5,  2, -1,  3,  5],
-    balada:   [4,  3,  2,  1,  0],
-    acustico: [0,  2,  4,  3,  2]
+    flat:     [0,  0,  0,  0,  0],   // Flat - no EQ adjustment (default)
+    pop:      [2,  3,  0,  3,  2],   // Pop - boosted bass and treble for punchy sound
+    rock:     [5,  2, -1,  3,  5],   // Rock - strong bass and treble, slight mid cut
+    balada:   [4,  3,  2,  1,  0],   // Ballad - warm bass, smooth mids, gentle treble
+    acustico: [0,  2,  4,  3,  2]    // Acoustic - enhanced mids for natural sound
 };
-let eqBands = [];   // BiquadFilterNode array
-let currentEQPreset = 'flat';
+
+let eqBands = [];   // Array of BiquadFilterNode objects - one for each frequency band
+let currentEQPreset = 'flat';  // String - currently selected EQ preset name
 
 // ============================================================================
 // DOM INITIALIZATION
 // ============================================================================
 
 // Initialize all DOM element references
+// This function queries the DOM for all needed elements and stores references in global variables.
+// Called once when the DOM is fully loaded to avoid repeated DOM queries (performance optimization).
 function initDOMElements() {
-    // Player UI elements
+    // Player UI elements - display track information and cover art
     coverArt = document.getElementById('coverArt');
     trackTitle = document.getElementById('trackTitle');
     trackArtist = document.getElementById('trackArtist');
@@ -86,7 +146,7 @@ function initDOMElements() {
     currentTimeEl = document.getElementById('currentTime');
     totalTimeEl = document.getElementById('totalTime');
 
-    // Control buttons
+    // Control buttons - playback controls
     playBtn = document.getElementById('playBtn');
     pauseBtn = document.getElementById('pauseBtn');
     stopBtn = document.getElementById('stopBtn');
@@ -95,29 +155,39 @@ function initDOMElements() {
     shuffleBtn = document.getElementById('shuffleBtn');
     repeatBtn = document.getElementById('repeatBtn');
 
-    // Volume and playlist
+    // Volume and playlist UI elements
     volumeSlider = document.getElementById('volumeSlider');
     collectionsEl = document.getElementById('collections');
     playlistEl = document.getElementById('playlist');
     playlistHeader = document.querySelector('.playlist-header');
 
-    // Visualizer
+    // Visualizer canvas for spectrum display
     visualizerCanvas = document.getElementById('visualizerCanvas');
-    if (visualizerCanvas) canvasCtx = visualizerCanvas.getContext('2d');
+    if (visualizerCanvas) canvasCtx = visualizerCanvas.getContext('2d');  // Get 2D rendering context
 
-    // Action buttons
+    // Action buttons - file operations and metadata editing
     addFilesBtn = document.getElementById('addFilesBtn');
     addFolderBtn = document.getElementById('addFolderBtn');
     editMetadataBtn = document.getElementById('editMetadataBtn');
 
-    // Language selector
+    // Ensure addFilesBtn is always enabled
+    if (addFilesBtn) {
+        addFilesBtn.disabled = false;
+        addFilesBtn.style.opacity = '1';
+    }
+    if (addFolderBtn) {
+        addFolderBtn.disabled = false;
+        addFolderBtn.style.opacity = '1';
+    }
+
+    // Language selector dropdown for UI translation
     languageSelector = document.getElementById('languageSelector');
 
-    // Context menus
+    // Context menus - right-click menus for tracks and collections
     contextMenu = document.getElementById('contextMenu');
     collectionContextMenu = document.getElementById('collectionContextMenu');
 
-    // Conversion modal elements
+    // Conversion modal elements - for audio conversion feature
     conversionModal = document.getElementById('conversionModal');
     progressModal = document.getElementById('progressModal');
     currentFileName = document.getElementById('currentFileName');
@@ -128,22 +198,23 @@ function initDOMElements() {
     progressFill = document.getElementById('progressFill');
     progressText = document.getElementById('progressText');
 
-    // Help modal elements
+    // Help modal elements - displays keyboard shortcuts and language selector
     helpModal = document.getElementById('helpModal');
     closeHelpModal = document.getElementById('closeHelpModal');
     helpBtnTop = document.getElementById('helpBtnTop');
 
-    // Search bar elements
+    // Search bar elements - for filtering tracks
     searchInput = document.getElementById('searchInput');
     searchInfo = document.getElementById('searchInfo');
 
-    // Favorites list
+    // Favorites list element - displays favorited tracks
     favoritesList = document.getElementById('favoritesList');
 
-    // Favorite icon
+    // Favorite icon element - heart icon below album info
     favoriteIcon = document.getElementById('favoriteIcon');
 
-    // Log missing elements
+    // Log missing elements for debugging
+    // This helps identify if expected DOM elements are missing from HTML
     const missing = [];
     if (!playBtn) missing.push('playBtn');
     if (!pauseBtn) missing.push('pauseBtn');
@@ -156,55 +227,61 @@ function initDOMElements() {
     if (missing.length > 0) console.error('Missing DOM elements:', missing);
 }
 
-// Initialize all event listeners (moved to end of file to ensure all functions are defined)
+// ============================================================================
+// EVENT LISTENERS INITIALIZATION
+// ============================================================================
+
+// Initialize all event listeners for UI interactions
+// This function is called after all other functions are defined to avoid reference errors.
+// It sets up click handlers, keyboard shortcuts, and other user interactions.
 function initEventListeners() {
     console.log('initEventListeners called');
     console.log('playBtn:', playBtn);
     console.log('pauseBtn:', pauseBtn);
     console.log('stopBtn:', stopBtn);
 
-    // Playback control buttons
+    // Playback control buttons - wrapped in try-catch for error handling
     try {
-        playBtn.addEventListener('click', play);
+        playBtn.addEventListener('click', play);  // Play button starts playback
         console.log('playBtn listener added');
     } catch (e) {
         console.error('Error adding playBtn listener:', e);
     }
     try {
-        pauseBtn.addEventListener('click', pause);
+        pauseBtn.addEventListener('click', pause);  // Pause button pauses playback
         console.log('pauseBtn listener added');
     } catch (e) {
         console.error('Error adding pauseBtn listener:', e);
     }
     try {
-        stopBtn.addEventListener('click', stopPlayback);
+        stopBtn.addEventListener('click', stopPlayback);  // Stop button stops playback and resets
         console.log('stopBtn listener added');
     } catch (e) {
         console.error('Error adding stopBtn listener:', e);
     }
     try {
-        previousBtn.addEventListener('click', playPrevious);
+        previousBtn.addEventListener('click', playPrevious);  // Previous button plays previous track
         console.log('previousBtn listener added');
     } catch (e) {
         console.error('Error adding previousBtn listener:', e);
     }
     try {
-        nextBtn.addEventListener('click', playNext);
+        nextBtn.addEventListener('click', playNext);  // Next button plays next track
         console.log('nextBtn listener added');
     } catch (e) {
         console.error('Error adding nextBtn listener:', e);
     }
 
-    // Seek slider - move to position in track
+    // Seek slider - allows user to seek to specific position in track
     seekSlider.addEventListener('input', () => {
-        audioElement1.currentTime = seekSlider.value;
+        audioElement1.currentTime = seekSlider.value;  // Set current time to slider value
     });
 
-    // Volume slider - adjust volume (0-100)
+    // Volume slider - adjusts playback volume (0-100 range)
     volumeSlider.addEventListener('input', () => {
-        const volume = volumeSlider.value / 100;
-        gainNode1.gain.value = volume;
-        gainNode2.gain.value = isCrossfading ? volume : 0;
+        const volume = volumeSlider.value / 100;  // Convert 0-100 to 0.0-1.0
+        gainNode1.gain.value = volume;  // Set volume for current track
+        gainNode2.gain.value = isCrossfading ? volume : 0;  // Set volume for crossfade track
         if (volume > 0 && isMuted) {
             isMuted = false;
             document.getElementById('volumeIconPath').setAttribute('d',
@@ -273,17 +350,7 @@ function initEventListeners() {
     if (favoriteIcon) {
         favoriteIcon.addEventListener('click', () => {
             if (currentTrackIndex >= 0) {
-                const track = playlist[currentTrackIndex];
-                if (track) {
-                    if (favorites.has(track.path)) {
-                        favorites.delete(track.path);
-                    } else {
-                        favorites.add(track.path);
-                    }
-                    renderFavorites();
-                    updateCounters();
-                    updateTrackInfo(track);
-                }
+                toggleFavorite(currentTrackIndex);  // Use the toggleFavorite function for consistency
             }
         });
     }
@@ -543,6 +610,12 @@ function initEventListeners() {
 
     ipcRenderer.on('menu-previous', () => { playPrevious(); });
     ipcRenderer.on('menu-next', () => { playNext(); });
+
+    // Handle file passed via command line (double-click on file)
+    ipcRenderer.on('play-file', (event, filePath) => {
+        console.log('Received file to play:', filePath);
+        playFileFromPath(filePath);
+    });
 
     // Maximize / restore - adjust border-radius
     ipcRenderer.on('window-maximized', () => {
@@ -945,61 +1018,80 @@ function playFromFavoritesQueue(queueIndex) {
     loadMetadata(track.path);
 }
 
-// Play a specific track by index
+// ============================================================================
+// PLAYBACK FUNCTIONS
+// ============================================================================
+
+// Play a specific track by index in the current playlist
+// This is the main function for starting playback of a track
+// Parameters:
+//   - index: Integer index of the track in the playlist array
 function playTrack(index) {
     console.log('playTrack() called with index:', index, 'playlist.length:', playlist.length);
     if (index < 0 || index >= playlist.length) {
         console.log('playTrack() returning: invalid index');
-        return;
+        return;  // Exit if index is out of bounds
     }
 
     // Clicking a track manually exits favorites mode
+    // This ensures manual track selection takes precedence over favorites queue
     isPlayingFavorites = false;
     favoritesQueue = [];
     favoritesQueueIndex = -1;
 
-    // Cancel any ongoing crossfade
+    // Cancel any ongoing crossfade to prevent audio conflicts
     isCrossfading = false;
 
-    currentTrackIndex = index;
-    const track = playlist[index];
+    currentTrackIndex = index;  // Set current track index
+    const track = playlist[index];  // Get track object
 
     console.log('playTrack() loading track:', track.path);
-    // Stop both audio elements
+    // Stop both audio elements to prevent overlapping audio
     audioElement1.pause();
     audioElement2.pause();
-    audioElement1.currentTime = 0;
+    audioElement1.currentTime = 0;  // Reset playback position
     audioElement2.currentTime = 0;
 
-    // Reset gain nodes
-    gainNode1.gain.value = 1;
-    gainNode2.gain.value = 0;
+    // Reset gain nodes to default values
+    gainNode1.gain.value = 1;  // Full volume for main track
+    gainNode2.gain.value = 0;  // Muted for crossfade track
 
-    audioElement1.src = `file://${track.path}`;  // Set audio source
+    audioElement1.src = `file://${track.path}`;  // Set audio source to file path
+
+    // Resume AudioContext if suspended (required by modern browsers)
+    if (audioContext.state === 'suspended') {
+        audioContext.resume();
+    }
+
     audioElement1.play();                        // Start playback
     isPlaying = true;                            // Update playing state
 
-    updatePlayPauseButtons();    // Update button visibility
-    updateTrackInfo(track);      // Display track information
-    updatePlaylistHighlight();   // Highlight current track in playlist
+    updatePlayPauseButtons();    // Update button visibility (show pause, hide play)
+    updateTrackInfo(track);      // Display track information (title, artist, album)
+    updatePlaylistHighlight();   // Highlight current track in playlist UI
 
-    loadMetadata(track.path);    // Extract and display metadata
+    loadMetadata(track.path);    // Extract and display metadata from audio file
 }
 
-// Update track information display (title, artist, album)
+// Update track information display (title, artist, album, favorite status)
+// This function updates the UI to show information about the currently playing track
+// Parameters:
+//   - track: Object containing track information (title, artist, album, path)
 function updateTrackInfo(track) {
-    const t = translations[currentLanguage];
+    const t = translations[currentLanguage];  // Get translations for current language
+    // Update track title, artist, and album with fallback to 'Desconocido' (Unknown)
     trackTitle.textContent = `${t.title_label}: ${track.title || 'Desconocido'}`;
     trackArtist.textContent = `${t.artist_label}: ${track.artist || 'Desconocido'}`;
     trackAlbum.textContent = `${t.album_label}: ${track.album || 'Desconocido'}`;
 
-    // Update favorite icon color
+    // Update favorite icon color based on favorite status
+    // Orange (#ff6b35) if favorited, gray (#666) if not
     if (favoriteIcon) {
-        const isFavorite = favorites.has(track.path);
+        const isFavorite = favorites.has(track.path);  // Check if track is in favorites set
         const heartIcon = isFavorite ?
             '<svg class="heart-icon" viewBox="0 0 24 24" width="20" height="20" fill="#ff6b35"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>' :
             '<svg class="heart-icon" viewBox="0 0 24 24" width="20" height="20" fill="#666"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
-        favoriteIcon.innerHTML = heartIcon;
+        favoriteIcon.innerHTML = heartIcon;  // Update the icon SVG
     }
 }
 
@@ -1008,27 +1100,33 @@ function updateTrackInfo(track) {
 // ============================================================================
 
 // Load metadata from audio file using IPC to main process
-// Extracts title, artist, album, and embedded cover art
+// This function extracts title, artist, album, and embedded cover art from audio files
+// Currently simplified to use filename as title (full metadata extraction disabled)
+// Parameters:
+//   - filePath: String path to the audio file
 async function loadMetadata(filePath) {
     try {
-        // Temporarily disabled - use filename as title
-        const fileName = path.basename(filePath);
-        const title = fileName.replace(/\.[^/.]+$/, '');  // Remove extension
+        // Temporarily disabled - use filename as title instead of reading metadata
+        // Full metadata extraction would use music-metadata library or FFmpeg via IPC
+        const fileName = path.basename(filePath);  // Get filename from full path
+        const title = fileName.replace(/\.[^/.]+$/, '');  // Remove file extension
 
-        const t = translations[currentLanguage];
+        const t = translations[currentLanguage];  // Get translations for current language
+        // Update UI with filename-based metadata
         trackTitle.textContent = `${t.title_label}: ${title}`;
-        trackArtist.textContent = `${t.artist_label}: Desconocido`;
-        trackAlbum.textContent = `${t.album_label}: Desconocido`;
+        trackArtist.textContent = `${t.artist_label}: Desconocido`;  // Unknown artist
+        trackAlbum.textContent = `${t.album_label}: Desconocido`;  // Unknown album
 
-        // Update playlist item with filename
+        // Update playlist item with filename-based metadata
+        // This ensures the playlist displays the extracted information
         if (playlist[currentTrackIndex]) {
             playlist[currentTrackIndex].title = title;
             playlist[currentTrackIndex].artist = 'Desconocido';
             playlist[currentTrackIndex].album = 'Desconocido';
-            renderPlaylist();
+            renderPlaylist();  // Re-render playlist to show updated metadata
         }
     } catch (error) {
-        console.error('Error loading metadata:', error);
+        console.error('Error loading metadata:', error);  // Log any errors
     }
 }
 
@@ -1090,6 +1188,12 @@ function play() {
         console.error('audioElement1 not initialized');
         return;
     }
+
+    // Resume AudioContext if suspended (required by modern browsers)
+    if (audioContext.state === 'suspended') {
+        audioContext.resume();
+    }
+
     if (currentTrackIndex >= 0) {
         audioElement1.play();           // Resume current track
         isPlaying = true;
@@ -1194,11 +1298,9 @@ function renderCollections() {
         });
     }
 
-    // Disable add files button if no collections exist (but keep add collection button enabled)
-    const hasCollections = collections.length > 0;
-    if (addFilesBtn) addFilesBtn.disabled = !hasCollections;
-    if (addFilesBtn) addFilesBtn.style.opacity = hasCollections ? '1' : '0.5';
-    // Add collection button should always be enabled to allow creating new collections
+    // Both buttons should always be enabled now (addFiles creates collection automatically if needed)
+    if (addFilesBtn) addFilesBtn.disabled = false;
+    if (addFilesBtn) addFilesBtn.style.opacity = '1';
     if (addFolderBtn) addFolderBtn.disabled = false;
     if (addFolderBtn) addFolderBtn.style.opacity = '1';
 }
@@ -1253,10 +1355,13 @@ function renderPlaylist() {
 
         // Handle click: toggle favorite if heart clicked, play track otherwise
         item.addEventListener('click', (e) => {
+            console.log('Playlist item clicked, index:', index, 'target:', e.target);
             const favoriteSpan = e.target.closest('.playlist-item-favorite');
             if (favoriteSpan) {
+                console.log('Heart icon clicked, toggling favorite');
                 toggleFavorite(index);
             } else {
+                console.log('Track clicked, calling playTrack');
                 playTrack(index);
             }
         });
@@ -1315,28 +1420,39 @@ function performSearch(query) {
     renderSearchResults(results, query);
 }
 
+// ============================================================================
+// SEARCH FUNCTIONALITY
+// ============================================================================
+
 // Render search results in the playlist
+// This function displays matching tracks from all collections in the playlist UI
+// Parameters:
+//   - results: Array of search result objects (each contains track, collection info)
+//   - query: String search query that was used
 function renderSearchResults(results, query) {
-    const t = translations[currentLanguage] || translations.es;
+    const t = translations[currentLanguage] || translations.es;  // Get translations, fallback to Spanish
     if (results.length === 0) {
+        // Display message if no results found
         playlistEl.innerHTML = `<div class="empty-playlist">${t.searchNoResults} "${query}"</div>`;
         searchInfo.textContent = `0 ${t.searchResults}`;
         return;
     }
 
-    searchInfo.textContent = `${results.length} ${t.searchResults}`;
+    searchInfo.textContent = `${results.length} ${t.searchResults}`;  // Display result count
 
-    playlistEl.innerHTML = '';
+    playlistEl.innerHTML = '';  // Clear playlist
     results.forEach((result, index) => {
         const item = document.createElement('div');
         item.className = 'playlist-item search-result';
 
         // Determine heart icon color based on favorite status
+        // Orange (#ff6b35) if favorited, gray (#666) if not
         const isFavorite = favorites.has(result.track.path);
         const heartIcon = isFavorite ?
             '<svg class="heart-icon" viewBox="0 0 24 24" width="16" height="16" fill="#ff6b35"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>' :
             '<svg class="heart-icon" viewBox="0 0 24 24" width="16" height="16" fill="#666"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
 
+        // Build playlist item HTML with heart icon, title, collection name, and duration
         item.innerHTML = `
             <span class="playlist-item-favorite" data-index="${result.trackIndex}">${heartIcon}</span>
             <span class="playlist-item-title">${result.track.title || result.track.fileName}</span>
@@ -1344,48 +1460,67 @@ function renderSearchResults(results, query) {
             <span class="playlist-item-duration">${result.track.duration || ''}</span>
         `;
 
-        // Handle click: play the track from its collection
+        // Handle click: toggle favorite if heart clicked, play track otherwise
         item.addEventListener('click', (e) => {
             const favoriteSpan = e.target.closest('.playlist-item-favorite');
             if (favoriteSpan) {
+                // User clicked the heart icon - toggle favorite status
                 toggleFavoritePath(result.track.path);
             } else {
-                // Switch to the collection and play the track
+                // User clicked the track - switch to its collection and play it
                 selectCollection(result.collectionIndex);
                 playTrack(result.trackIndex);
             }
         });
 
-        playlistEl.appendChild(item);
+        playlistEl.appendChild(item);  // Add item to playlist
     });
 }
 
 // Toggle favorite by track index in current playlist
+// This is a wrapper function that gets the track from the playlist and toggles its favorite status
+// Parameters:
+//   - index: Integer index of the track in the current playlist
 function toggleFavorite(index) {
     const track = playlist[index];
-    if (!track) return;
-    toggleFavoritePath(track.path);
+    if (!track) return;  // Exit if track doesn't exist
+    toggleFavoritePath(track.path);  // Toggle using file path (unique identifier)
 }
 
-// Toggle favorite by file path (works cross-collection)
+// Toggle favorite status by file path (works cross-collection)
+// This is the core favorites function - uses file path as unique identifier
+// This allows the same file in different collections to share favorite status
+// Parameters:
+//   - path: String file path of the track
+// ============================================================================
+// CRITICAL: DO NOT MODIFY THIS FUNCTION - FAVORITES SYSTEM IS WORKING CORRECTLY
+// Any modification to this function will break the favorites functionality
+// ============================================================================
 function toggleFavoritePath(path) {
     if (favorites.has(path)) {
-        favorites.delete(path);
+        favorites.delete(path);  // Remove from favorites if already present
     } else {
-        favorites.add(path);
+        favorites.add(path);  // Add to favorites if not present
     }
-    renderPlaylist();     // Re-render to update heart icon
-    renderFavorites();    // Re-render favorites list
+    renderPlaylist();     // Re-render playlist to update heart icon colors
+    renderFavorites();    // Re-render favorites list to show updated state
+    // Update the heart icon in the player header to reflect new favorite status
+    if (currentTrackIndex >= 0 && playlist[currentTrackIndex]) {
+        updateTrackInfo(playlist[currentTrackIndex]);
+    }
 }
 
 // Render the favorites list panel
+// This function displays all favorited tracks from all collections in the favorites panel
+// Each item shows the track number, title, and collection name
 function renderFavorites() {
-    if (!favoritesList) return;
+    if (!favoritesList) return;  // Exit if favorites list element doesn't exist
     if (favorites.size === 0) {
+        // Display message if no favorites exist
         favoritesList.innerHTML = '<div class="empty-favorites">No hay favoritos</div>';
     } else {
-        favoritesList.innerHTML = '';
-        let favNumber = 0;
+        favoritesList.innerHTML = '';  // Clear favorites list
+        let favNumber = 0;  // Counter for favorite numbering
         // Collect all favorited tracks across all collections
         collections.forEach((collection, collectionIndex) => {
             collection.playlist.forEach((track, trackIndex) => {
@@ -1423,6 +1558,78 @@ function updateCounters() {
     if (playlistCountEl) playlistCountEl.textContent = playlist.length;
 }
 
+// Play a file from its file path (when opened via double-click on file)
+// This function adds the file to the current collection and plays it
+async function playFileFromPath(filePath) {
+    console.log('playFileFromPath called with:', filePath);
+
+    const fileName = filePath.split('/').pop();
+    const path = require('path');
+
+    // Get duration for audio file
+    const tempAudio = new Audio(`file://${filePath}`);
+    await new Promise((resolve) => {
+        tempAudio.addEventListener('loadedmetadata', () => {
+            console.log('Metadata loaded for:', filePath);
+            resolve();
+        });
+        tempAudio.addEventListener('error', (e) => {
+            console.error('Error loading metadata:', e);
+            resolve();
+        });
+    });
+    const duration = tempAudio.duration && !isNaN(tempAudio.duration) ? formatTime(tempAudio.duration) : '';
+    console.log('Duration:', duration);
+
+    // Create track object
+    const track = {
+        path: filePath,
+        fileName: fileName,
+        title: fileName.replace(/\.[^/.]+$/, ''),
+        artist: '',
+        album: '',
+        duration: duration
+    };
+
+    // If no collections exist, create one
+    if (collections.length === 0) {
+        collections.push({
+            name: 'Archivos Individuales',
+            playlist: []
+        });
+        currentCollectionIndex = 0;
+        playlist = collections[0].playlist;
+        console.log('Created first collection');
+    }
+
+    // Check if file already exists in current collection
+    const existingFile = playlist.find(t => t.path === filePath);
+    if (existingFile) {
+        console.log('File already exists in current collection, just playing it');
+        const trackIndex = playlist.findIndex(t => t.path === filePath);
+        renderCollections();
+        renderPlaylist();
+        playTrack(trackIndex);
+        return;
+    }
+
+    // Add file to current collection
+    playlist.push(track);
+    console.log('Added file to current collection, new playlist length:', playlist.length);
+
+    // Find the track index and play it
+    const trackIndex = playlist.findIndex(t => t.path === filePath);
+    console.log('Track index:', trackIndex);
+    if (trackIndex >= 0) {
+        renderCollections();
+        renderPlaylist();
+        console.log('Calling playTrack with index:', trackIndex);
+        playTrack(trackIndex);
+    } else {
+        console.error('Track not found in playlist');
+    }
+}
+
 // Build a temporary playlist of only favorited tracks and start playback
 function playFavoritesOnly() {
     if (favorites.size === 0) {
@@ -1458,9 +1665,14 @@ function playFavoritesOnly() {
 // Add individual audio files to current collection
 // Opens file dialog via IPC and processes each file to get duration
 async function addFiles() {
-    if (currentCollectionIndex < 0) {
-        alert('Por favor selecciona o crea una colección primero');
-        return;
+    // If no collections exist, create one automatically
+    if (collections.length === 0) {
+        collections.push({
+            name: 'Archivos Individuales',
+            playlist: []
+        });
+        currentCollectionIndex = 0;
+        playlist = collections[0].playlist;
     }
 
     const filePaths = await ipcRenderer.invoke('select-files');  // Open file dialog
