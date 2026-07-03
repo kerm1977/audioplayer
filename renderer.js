@@ -2521,6 +2521,9 @@ async function saveState() {
         })),
         favorites: [...favorites],
         currentCollectionIndex,
+        currentTrackIndex,
+        isPlaying,
+        currentTime: audioElement1 ? audioElement1.currentTime : 0,
         volume: volumeSlider ? parseInt(volumeSlider.value) : 100,
         eqPreset: currentEQPreset,
         eqGains: eqBands.map(b => b.gain.value)
@@ -2557,6 +2560,37 @@ async function loadState() {
         renderCollections();
         const items = document.querySelectorAll('.collection-item');
         if (items[currentCollectionIndex]) items[currentCollectionIndex].classList.add('active');
+    }
+
+    // Restore current track index and playback state
+    if (state.currentTrackIndex >= 0 && state.currentTrackIndex < playlist.length) {
+        currentTrackIndex = state.currentTrackIndex;
+        const track = playlist[currentTrackIndex];
+
+        // Load the track
+        audioElement1.src = `file://${track.path}`;
+
+        // Restore playback position
+        if (state.currentTime > 0) {
+            audioElement1.currentTime = state.currentTime;
+        }
+
+        // Resume playback if it was playing
+        if (state.isPlaying) {
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+            audioElement1.play();
+            isPlaying = true;
+            updatePlayPauseButtons();
+            updateTrackInfo(track);
+            updatePlaylistHighlight();
+        } else {
+            isPlaying = false;
+            updatePlayPauseButtons();
+            updateTrackInfo(track);
+            updatePlaylistHighlight();
+        }
     }
 
     // Restore volume
