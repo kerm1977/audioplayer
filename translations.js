@@ -105,7 +105,10 @@ const translations = {
         collapseCollections: "Colapsar/Expandir Colecciones",
         collapsePlaylist: "Colapsar/Expandir Lista de Reproducción",
         individualFiles: "Archivos Individuales",
-        playFavorites: "Reproducir favoritos"
+        playFavorites: "Reproducir favoritos",
+        learnMore: "Más información",
+        credits: "ARIA Music Player fue creado por La Tribu de Los Libres",
+        contact: "lthikingcr@gmail.com"
     },
     /***************************************************************************
      * ENGLISH (en)
@@ -194,7 +197,10 @@ const translations = {
         collapseCollections: "Collapse/Expand Collections",
         collapsePlaylist: "Collapse/Expand Playlist",
         individualFiles: "Individual Files",
-        playFavorites: "Play favorites"
+        playFavorites: "Play favorites",
+        learnMore: "Learn More",
+        credits: "ARIA Music Player was created by La Tribu de Los Libres",
+        contact: "lthikingcr@gmail.com"
     },
     /***************************************************************************
      * PORTUGUESE (pt)
@@ -284,7 +290,10 @@ const translations = {
         collapseCollections: "Recolher/Expandir Coleções",
         collapsePlaylist: "Recolher/Expandir Lista de Reprodução",
         individualFiles: "Arquivos Individuais",
-        playFavorites: "Reproduzir favoritos"
+        playFavorites: "Reproduzir favoritos",
+        learnMore: "Saiba Mais",
+        credits: "ARIA Music Player foi criado por La Tribu de Los Libres",
+        contact: "lthikingcr@gmail.com"
     },
     /***************************************************************************
      * FRENCH (fr)
@@ -374,7 +383,10 @@ const translations = {
         collapseCollections: "Réduire/Étendre Collections",
         collapsePlaylist: "Réduire/Étendre Liste de lecture",
         individualFiles: "Fichiers individuels",
-        playFavorites: "Lire les favoris"
+        playFavorites: "Lire les favoris",
+        learnMore: "En savoir plus",
+        credits: "ARIA Music Player a été créé par La Tribu de Los Libres",
+        contact: "lthikingcr@gmail.com"
     },
     /***************************************************************************
      * GERMAN (de)
@@ -464,7 +476,10 @@ const translations = {
         collapseCollections: "Sammlungen reduzieren/erweitern",
         collapsePlaylist: "Wiedergabeliste reduzieren/erweitern",
         individualFiles: "Einzelne Dateien",
-        playFavorites: "Favoriten abspielen"
+        playFavorites: "Favoriten abspielen",
+        learnMore: "Mehr erfahren",
+        credits: "ARIA Music Player wurde von La Tribu de Los Libres erstellt",
+        contact: "lthikingcr@gmail.com"
     },
     /***************************************************************************
      * ITALIAN (it)
@@ -554,7 +569,10 @@ const translations = {
         collapseCollections: "Comprimi/Espandi Raccolte",
         collapsePlaylist: "Comprimi/Espandi Playlist",
         individualFiles: "File individuali",
-        playFavorites: "Riproduci preferiti"
+        playFavorites: "Riproduci preferiti",
+        learnMore: "Scopri di più",
+        credits: "ARIA Music Player è stato creato da La Tribu de Los Libres",
+        contact: "lthikingcr@gmail.com"
     },
     /***************************************************************************
      * RUSSIAN (ru)
@@ -644,7 +662,10 @@ const translations = {
         collapseCollections: "Свернуть/Развернуть Коллекции",
         collapsePlaylist: "Свернуть/Развернуть Плейлист",
         individualFiles: "Отдельные файлы",
-        playFavorites: "Воспроизвести избранное"
+        playFavorites: "Воспроизвести избранное",
+        learnMore: "Узнать больше",
+        credits: "ARIA Music Player был создан La Tribu de Los Libres",
+        contact: "lthikingcr@gmail.com"
     },
     /***************************************************************************
      * CHINESE (zh)
@@ -734,7 +755,10 @@ const translations = {
         collapseCollections: "折叠/展开 收藏夹",
         collapsePlaylist: "折叠/展开 播放列表",
         individualFiles: "单个文件",
-        playFavorites: "播放收藏"
+        playFavorites: "播放收藏",
+        learnMore: "了解更多",
+        credits: "ARIA Music Player 由 La Tribu de Los Libres 创建",
+        contact: "lthikingcr@gmail.com"
     },
     /***************************************************************************
      * JAPANESE (ja)
@@ -824,7 +848,10 @@ const translations = {
         collapseCollections: "コレクションを折りたたむ/展開",
         collapsePlaylist: "プレイリストを折りたたむ/展開",
         individualFiles: "個別ファイル",
-        playFavorites: "お気に入りを再生"
+        playFavorites: "お気に入りを再生",
+        learnMore: "詳細を見る",
+        credits: "ARIA Music Player は La Tribu de Los Libres によって作成されました",
+        contact: "lthikingcr@gmail.com"
     }
 };
 

@@ -1211,6 +1211,8 @@ body {
     align-items: center;
     padding: 20px;
     border-bottom: 1px solid #3a3a3a;
+    position: relative;
+    z-index: 5;
 }
 
 .modal-header h2 {
@@ -1227,13 +1229,15 @@ body {
     font-size: 28px;
     cursor: pointer;
     padding: 0;
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 4px;
     transition: background 0.2s;
+    position: relative;
+    z-index: 10;
 }
 
 .modal-close:hover {

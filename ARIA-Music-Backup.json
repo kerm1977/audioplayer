@@ -1,0 +1,1204 @@
+{
+  "version": "1.0",
+  "exportDate": "2026-07-04T01:53:47.508Z",
+  "collections": [
+    {
+      "name": "Archivos Individuales",
+      "playlist": [
+        {
+          "path": "/home/pmint/Música/musica de la tribu/NO BUSCAMOS SER PRIMEROS.mp3",
+          "fileName": "NO BUSCAMOS SER PRIMEROS.mp3",
+          "title": "NO BUSCAMOS SER PRIMEROS",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "03:12",
+          "coverPath": "/home/pmint/Imágenes/FOTOS DE LA TRIBU GRUPALES /2.jpg"
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/No somos miles.mp3",
+          "fileName": "No somos miles.mp3",
+          "title": "No somos miles",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "03:02",
+          "coverPath": "/home/pmint/Imágenes/img_001.jpeg"
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(14).mp3",
+          "fileName": "AI Music(14).mp3",
+          "title": "AI Music(14)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:28",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(12).mp3",
+          "fileName": "AI Music(12).mp3",
+          "title": "AI Music(12)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "04:30",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(13).mp3",
+          "fileName": "AI Music(13).mp3",
+          "title": "AI Music(13)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "04:00",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(9).mp3",
+          "fileName": "AI Music(9).mp3",
+          "title": "AI Music(9)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:39",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(4).mp3",
+          "fileName": "AI Music(4).mp3",
+          "title": "AI Music(4)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "00:56",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(10).mp3",
+          "fileName": "AI Music(10).mp3",
+          "title": "AI Music(10)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:19",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(11).mp3",
+          "fileName": "AI Music(11).mp3",
+          "title": "AI Music(11)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "01:58",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(18).mp3",
+          "fileName": "AI Music(18).mp3",
+          "title": "AI Music(18)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "01:34",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(19).mp3",
+          "fileName": "AI Music(19).mp3",
+          "title": "AI Music(19)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "01:46",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(15).mp3",
+          "fileName": "AI Music(15).mp3",
+          "title": "AI Music(15)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:52",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(16).mp3",
+          "fileName": "AI Music(16).mp3",
+          "title": "AI Music(16)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "06:30",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(17).mp3",
+          "fileName": "AI Music(17).mp3",
+          "title": "AI Music(17)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "05:23",
+          "coverPath": null
+        }
+      ]
+    },
+    {
+      "name": "INSTRUMENTAL ORIGINAL",
+      "playlist": [
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(1).mp3",
+          "fileName": "AI Music(1).mp3",
+          "title": "AI Music(1)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:23",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(10).mp3",
+          "fileName": "AI Music(10).mp3",
+          "title": "AI Music(10)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:19",
+          "coverPath": "/home/pmint/Imágenes/FOTOS DE LA TRIBU GRUPALES /622105012_122272537130063024_8647846740346376513_n.jpg"
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(11).mp3",
+          "fileName": "AI Music(11).mp3",
+          "title": "AI Music(11)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "01:58",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(12).mp3",
+          "fileName": "AI Music(12).mp3",
+          "title": "AI Music(12)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "04:30",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(13).mp3",
+          "fileName": "AI Music(13).mp3",
+          "title": "AI Music(13)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "04:00",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(14).mp3",
+          "fileName": "AI Music(14).mp3",
+          "title": "AI Music(14)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:28",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(15).mp3",
+          "fileName": "AI Music(15).mp3",
+          "title": "AI Music(15)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:52",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(16).mp3",
+          "fileName": "AI Music(16).mp3",
+          "title": "AI Music(16)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "06:30",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(17).mp3",
+          "fileName": "AI Music(17).mp3",
+          "title": "AI Music(17)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "05:23",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(18).mp3",
+          "fileName": "AI Music(18).mp3",
+          "title": "AI Music(18).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "01:34",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(19).mp3",
+          "fileName": "AI Music(19).mp3",
+          "title": "AI Music(19).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "01:46",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(2).mp3",
+          "fileName": "AI Music(2).mp3",
+          "title": "AI Music(2).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:23",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(20).mp3",
+          "fileName": "AI Music(20).mp3",
+          "title": "AI Music(20)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:17",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(21).mp3",
+          "fileName": "AI Music(21).mp3",
+          "title": "AI Music(21)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "00:52",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(22).mp3",
+          "fileName": "AI Music(22).mp3",
+          "title": "AI Music(22)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "00:37",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(23).mp3",
+          "fileName": "AI Music(23).mp3",
+          "title": "AI Music(23)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "00:52",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(24).mp3",
+          "fileName": "AI Music(24).mp3",
+          "title": "AI Music(24)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "00:37",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(25).mp3",
+          "fileName": "AI Music(25).mp3",
+          "title": "AI Music(25)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "01:07",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(26).mp3",
+          "fileName": "AI Music(26).mp3",
+          "title": "AI Music(26)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "01:22",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(27).mp3",
+          "fileName": "AI Music(27).mp3",
+          "title": "AI Music(27)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "03:43",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(28).mp3",
+          "fileName": "AI Music(28).mp3",
+          "title": "AI Music(28).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:00",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(29).mp3",
+          "fileName": "AI Music(29).mp3",
+          "title": "AI Music(29).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "01:01",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(3).mp3",
+          "fileName": "AI Music(3).mp3",
+          "title": "AI Music(3).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:35",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(30).mp3",
+          "fileName": "AI Music(30).mp3",
+          "title": "AI Music(30).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "01:18",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(31).mp3",
+          "fileName": "AI Music(31).mp3",
+          "title": "AI Music(31)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:01",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(32).mp3",
+          "fileName": "AI Music(32).mp3",
+          "title": "AI Music(32).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "00:56",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(33).mp3",
+          "fileName": "AI Music(33).mp3",
+          "title": "AI Music(33)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:44",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(34).mp3",
+          "fileName": "AI Music(34).mp3",
+          "title": "AI Music(34).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:44",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(35).mp3",
+          "fileName": "AI Music(35).mp3",
+          "title": "AI Music(35).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:44",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(36).mp3",
+          "fileName": "AI Music(36).mp3",
+          "title": "AI Music(36).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:01",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(4).mp3",
+          "fileName": "AI Music(4).mp3",
+          "title": "AI Music(4).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "00:56",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(5).mp3",
+          "fileName": "AI Music(5).mp3",
+          "title": "AI Music(5).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "00:53",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(6).mp3",
+          "fileName": "AI Music(6).mp3",
+          "title": "AI Music(6).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:27",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(7).mp3",
+          "fileName": "AI Music(7).mp3",
+          "title": "AI Music(7).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:18",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(8).mp3",
+          "fileName": "AI Music(8).mp3",
+          "title": "AI Music(8).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:21",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music(9).mp3",
+          "fileName": "AI Music(9).mp3",
+          "title": "AI Music(9)",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:39",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/INSTRUMENTAL ORIGINAL/AI Music.mp3",
+          "fileName": "AI Music.mp3",
+          "title": "AI Music",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:03",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Desktop/kkk.wav",
+          "fileName": "kkk.wav",
+          "title": "kkk",
+          "artist": "Desconocido",
+          "album": "Desconocido",
+          "duration": "02:28",
+          "coverPath": null
+        }
+      ]
+    },
+    {
+      "name": "musica de la tribu",
+      "playlist": [
+        {
+          "path": "/home/pmint/Música/musica de la tribu/2 Aniversario.mp3",
+          "fileName": "2 Aniversario.mp3",
+          "title": "2 Aniversario.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:29",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/2026.mp3",
+          "fileName": "2026.mp3",
+          "title": "2026.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:43",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/A GOLPE DE BASTON.mp3",
+          "fileName": "A GOLPE DE BASTON.mp3",
+          "title": "A GOLPE DE BASTON.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:07",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/A GOLPE DE BASTON.wav",
+          "fileName": "A GOLPE DE BASTON.wav",
+          "title": "A GOLPE DE BASTON.wav",
+          "artist": "",
+          "album": "",
+          "duration": "03:07",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/A PASO FIRME.mp3",
+          "fileName": "A PASO FIRME.mp3",
+          "title": "A PASO FIRME.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:03",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/AGRADECIDOS.mp3",
+          "fileName": "AGRADECIDOS.mp3",
+          "title": "AGRADECIDOS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "05:13",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/AI Music(15).mp3",
+          "fileName": "AI Music(15).mp3",
+          "title": "AI Music(15).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:53",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/AI Music(2123).mp3",
+          "fileName": "AI Music(2123).mp3",
+          "title": "AI Music(2123).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:13",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/AI Music(25).mp3",
+          "fileName": "AI Music(25).mp3",
+          "title": "AI Music(25).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:47",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/AI Music(51).mp3",
+          "fileName": "AI Music(51).mp3",
+          "title": "AI Music(51).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:44",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/AI Music(59).mp3",
+          "fileName": "AI Music(59).mp3",
+          "title": "AI Music(59).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:21",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/AI Music(62).mp3",
+          "fileName": "AI Music(62).mp3",
+          "title": "AI Music(62).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "05:13",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/AI Music(63).mp3",
+          "fileName": "AI Music(63).mp3",
+          "title": "AI Music(63).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:01",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/AI Music(65).mp3",
+          "fileName": "AI Music(65).mp3",
+          "title": "AI Music(65).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:32",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/AI Music(67).mp3",
+          "fileName": "AI Music(67).mp3",
+          "title": "AI Music(67).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:22",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/AMIGOS Y VIAJEROS.mp3",
+          "fileName": "AMIGOS Y VIAJEROS.mp3",
+          "title": "AMIGOS Y VIAJEROS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:42",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/AUNQUE EL DÍA HOY SE TORNA GRIS.mp3",
+          "fileName": "AUNQUE EL DÍA HOY SE TORNA GRIS.mp3",
+          "title": "AUNQUE EL DÍA HOY SE TORNA GRIS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:50",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/CANCION MÍSTICA.mp3",
+          "fileName": "CANCION MÍSTICA.mp3",
+          "title": "CANCION MÍSTICA.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:12",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/CANCION ORIGINAL DE LA TRIBU CORRECTA.mp3",
+          "fileName": "CANCION ORIGINAL DE LA TRIBU CORRECTA.mp3",
+          "title": "CANCION ORIGINAL DE LA TRIBU CORRECTA.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:45",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/CANCION_ORIGINAL_DE_LA_TRIBU.mp3",
+          "fileName": "CANCION_ORIGINAL_DE_LA_TRIBU.mp3",
+          "title": "CANCION_ORIGINAL_DE_LA_TRIBU.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:01",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/CONQUISTAREMOS LA MONTAÑA.mp3",
+          "fileName": "CONQUISTAREMOS LA MONTAÑA.mp3",
+          "title": "CONQUISTAREMOS LA MONTAÑA.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:03",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/CUMPLEAÑOS A LA TRIBU.mp3",
+          "fileName": "CUMPLEAÑOS A LA TRIBU.mp3",
+          "title": "CUMPLEAÑOS A LA TRIBU.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:22",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/Caminando a La Libertdad.mp3",
+          "fileName": "Caminando a La Libertdad.mp3",
+          "title": "Caminando a La Libertdad.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:18",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/Camino de Aventura(4).mp3",
+          "fileName": "Camino de Aventura(4).mp3",
+          "title": "Camino de Aventura(4).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:11",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/Chirripo 2.0 Raíces que abrazan los Robles.mp3",
+          "fileName": "Chirripo 2.0 Raíces que abrazan los Robles.mp3",
+          "title": "Chirripo 2.0 Raíces que abrazan los Robles.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:00",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/DIA DE LA MADRE.mp3",
+          "fileName": "DIA DE LA MADRE.mp3",
+          "title": "DIA DE LA MADRE.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:24",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/EL ECO.mp3",
+          "fileName": "EL ECO.mp3",
+          "title": "EL ECO.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:28",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/ENTRE TRIBUS Y MONTAÑAS.mp3",
+          "fileName": "ENTRE TRIBUS Y MONTAÑAS.mp3",
+          "title": "ENTRE TRIBUS Y MONTAÑAS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:00",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/ENTRE VOLCANES.mp3",
+          "fileName": "ENTRE VOLCANES.mp3",
+          "title": "ENTRE VOLCANES.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:00",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/FE ENTRE SOMBRAS.mp3",
+          "fileName": "FE ENTRE SOMBRAS.mp3",
+          "title": "FE ENTRE SOMBRAS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:01",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/FIN EL CAMINO DE COSTA RICA.mp3",
+          "fileName": "FIN EL CAMINO DE COSTA RICA.mp3",
+          "title": "FIN EL CAMINO DE COSTA RICA.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:19",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/FOLKOR DE LA TRIBU.mp3",
+          "fileName": "FOLKOR DE LA TRIBU.mp3",
+          "title": "FOLKOR DE LA TRIBU.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:08",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/GRADUACION 2.mp3",
+          "fileName": "GRADUACION 2.mp3",
+          "title": "GRADUACION 2.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:04",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/IYOK AMI.mp3",
+          "fileName": "IYOK AMI.mp3",
+          "title": "IYOK AMI.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:09",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/LA TIERRA QUE NOS VIO NACER.mp3",
+          "fileName": "LA TIERRA QUE NOS VIO NACER.mp3",
+          "title": "LA TIERRA QUE NOS VIO NACER.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:52",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/LA TIRADERA.mp3",
+          "fileName": "LA TIRADERA.mp3",
+          "title": "LA TIRADERA.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:03",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/LAS GARRAPATAS.mp3",
+          "fileName": "LAS GARRAPATAS.mp3",
+          "title": "LAS GARRAPATAS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:35",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/LO QUE  SOMOS.mp3",
+          "fileName": "LO QUE  SOMOS.mp3",
+          "title": "LO QUE  SOMOS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:12",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/LO QUE SOMOS.mp3",
+          "fileName": "LO QUE SOMOS.mp3",
+          "title": "LO QUE SOMOS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:52",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/Lo Viajeros Somos locos A.mp3",
+          "fileName": "Lo Viajeros Somos locos A.mp3",
+          "title": "Lo Viajeros Somos locos A.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:38",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/NO BUSCAMOS LA GLORIA.mp3",
+          "fileName": "NO BUSCAMOS LA GLORIA.mp3",
+          "title": "NO BUSCAMOS LA GLORIA.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:43",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/NO BUSCAMOS SER PRIMEROS.mp3",
+          "fileName": "NO BUSCAMOS SER PRIMEROS.mp3",
+          "title": "NO BUSCAMOS SER PRIMEROS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:12",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/NUESTRA GENTE.mp3",
+          "fileName": "NUESTRA GENTE.mp3",
+          "title": "NUESTRA GENTE.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:59",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/No somos miles.mp3",
+          "fileName": "No somos miles.mp3",
+          "title": "No somos miles.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:02",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/Nuestros pasos tienen precio.mp3",
+          "fileName": "Nuestros pasos tienen precio.mp3",
+          "title": "Nuestros pasos tienen precio.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:04",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/PADRES DE LA TRIBU.mp3",
+          "fileName": "PADRES DE LA TRIBU.mp3",
+          "title": "PADRES DE LA TRIBU.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:10",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/PARA RECONOCIMIENTOS.mp3",
+          "fileName": "PARA RECONOCIMIENTOS.mp3",
+          "title": "PARA RECONOCIMIENTOS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:10",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/PFUEGO.mp3",
+          "fileName": "PFUEGO.mp3",
+          "title": "PFUEGO.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:12",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/Porque Somos La Tribu de Los Libres.mp3",
+          "fileName": "Porque Somos La Tribu de Los Libres.mp3",
+          "title": "Porque Somos La Tribu de Los Libres.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:53",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/RAICES AL VIENTO.mp3",
+          "fileName": "RAICES AL VIENTO.mp3",
+          "title": "RAICES AL VIENTO.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:00",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/SALUDO DE LA TRIBU A.mp3",
+          "fileName": "SALUDO DE LA TRIBU A.mp3",
+          "title": "SALUDO DE LA TRIBU A.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "01:56",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/SAN PABLO.mp3",
+          "fileName": "SAN PABLO.mp3",
+          "title": "SAN PABLO.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:38",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/SENDEROS DE VIDA.mp3",
+          "fileName": "SENDEROS DE VIDA.mp3",
+          "title": "SENDEROS DE VIDA.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:25",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/SOLO TU Y YO [V1uiXEGSUiA].mp3",
+          "fileName": "SOLO TU Y YO [V1uiXEGSUiA].mp3",
+          "title": "SOLO TU Y YO [V1uiXEGSUiA].mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:44",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/SOMO AMIGOS Y CAMINANTES.mp3",
+          "fileName": "SOMO AMIGOS Y CAMINANTES.mp3",
+          "title": "SOMO AMIGOS Y CAMINANTES.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:09",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/SOMOS DIFERENTES.mp3",
+          "fileName": "SOMOS DIFERENTES.mp3",
+          "title": "SOMOS DIFERENTES.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:02",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/SOMOS SENDERISTAS.mp3",
+          "fileName": "SOMOS SENDERISTAS.mp3",
+          "title": "SOMOS SENDERISTAS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:24",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/SOMOS TAN DISTINTOS.mp3",
+          "fileName": "SOMOS TAN DISTINTOS.mp3",
+          "title": "SOMOS TAN DISTINTOS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:02",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/SUMANDO PASOS.mp3",
+          "fileName": "SUMANDO PASOS.mp3",
+          "title": "SUMANDO PASOS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:23",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/SUZZIE.mp3",
+          "fileName": "SUZZIE.mp3",
+          "title": "SUZZIE.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:24",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/Senderista del Tiempo y viento.mp3",
+          "fileName": "Senderista del Tiempo y viento.mp3",
+          "title": "Senderista del Tiempo y viento.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:12",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/Somos Hermanos Amigos.mp3",
+          "fileName": "Somos Hermanos Amigos.mp3",
+          "title": "Somos Hermanos Amigos.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:09",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/Somos La Tribu de La Libertad.mp3",
+          "fileName": "Somos La Tribu de La Libertad.mp3",
+          "title": "Somos La Tribu de La Libertad.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:24",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/Somos más de 100 razones(1).mp3",
+          "fileName": "Somos más de 100 razones(1).mp3",
+          "title": "Somos más de 100 razones(1).mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:44",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/THE SONG OF THE CERRO AND THE STONE OF THE Encant.mp3",
+          "fileName": "THE SONG OF THE CERRO AND THE STONE OF THE Encant.mp3",
+          "title": "THE SONG OF THE CERRO AND THE STONE OF THE Encant.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:03",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/TRIBU DEL SENDERO.mp3",
+          "fileName": "TRIBU DEL SENDERO.mp3",
+          "title": "TRIBU DEL SENDERO.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:06",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/UBUNTU.mp3",
+          "fileName": "UBUNTU.mp3",
+          "title": "UBUNTU.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:37",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/VAMOS MÁS.mp3",
+          "fileName": "VAMOS MÁS.mp3",
+          "title": "VAMOS MÁS.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:51",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/VOCES DE LA TRIBU.mp3",
+          "fileName": "VOCES DE LA TRIBU.mp3",
+          "title": "VOCES DE LA TRIBU.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:32",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/VOLCAN BARU.mp3",
+          "fileName": "VOLCAN BARU.mp3",
+          "title": "VOLCAN BARU.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:30",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/VOLCAN BARVA.mp3",
+          "fileName": "VOLCAN BARVA.mp3",
+          "title": "VOLCAN BARVA.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:36",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/VOLCAN RINCON DE LA VIEJA.mp3",
+          "fileName": "VOLCAN RINCON DE LA VIEJA.mp3",
+          "title": "VOLCAN RINCON DE LA VIEJA.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "04:34",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/baru.mp3",
+          "fileName": "baru.mp3",
+          "title": "baru.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:30",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/cerrodragon.mp3",
+          "fileName": "cerrodragon.mp3",
+          "title": "cerrodragon.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:59",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/chirripo.mp3",
+          "fileName": "chirripo.mp3",
+          "title": "chirripo.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:12",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/el camino de cr.mp3",
+          "fileName": "el camino de cr.mp3",
+          "title": "el camino de cr.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:58",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/habran Mil Razones.mp3",
+          "fileName": "habran Mil Razones.mp3",
+          "title": "habran Mil Razones.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:45",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/losviajerossomoslocos.mp3",
+          "fileName": "losviajerossomoslocos.mp3",
+          "title": "losviajerossomoslocos.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "02:37",
+          "coverPath": null
+        },
+        {
+          "path": "/home/pmint/Música/musica de la tribu/voces lejanas.mp3",
+          "fileName": "voces lejanas.mp3",
+          "title": "voces lejanas.mp3",
+          "artist": "",
+          "album": "",
+          "duration": "03:37",
+          "coverPath": null
+        }
+      ]
+    },
+    {
+      "name": "Mis Grabaciones",
+      "playlist": []
+    }
+  ]
+}

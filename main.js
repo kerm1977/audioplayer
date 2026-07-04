@@ -417,7 +417,7 @@ ipcMain.handle('save-recording', async (event, filename, base64Data) => {
 
 // IPC handler for getting audio duration using FFmpeg
 // Parameters: filePath (path to audio file)
-// Returns: Object with duration in seconds
+// Returns: Object with duration in seconds, bitrate, and sample rate
 ipcMain.handle('get-audio-duration', async (event, filePath) => {
     try {
         const ffmpeg = require('fluent-ffmpeg');
@@ -431,14 +431,18 @@ ipcMain.handle('get-audio-duration', async (event, filePath) => {
                     } else {
                         console.log('FFprobe metadata:', JSON.stringify(metadata.format, null, 2));
                         const duration = metadata.format.duration;
+                        const bitrate = metadata.format.bit_rate ? Math.round(metadata.format.bit_rate / 1000) : null;
+                        const sampleRate = metadata.streams && metadata.streams[0] ? metadata.streams[0].sample_rate : null;
                         console.log('Duration from FFprobe:', duration);
-                        resolve({ duration: duration });
+                        console.log('Bitrate from FFprobe:', bitrate);
+                        console.log('Sample rate from FFprobe:', sampleRate);
+                        resolve({ duration: duration, bitrate: bitrate, sampleRate: sampleRate });
                     }
                 });
         });
     } catch (err) {
         console.error('Error getting audio duration:', err);
-        return { duration: null };
+        return { duration: null, bitrate: null, sampleRate: null };
     }
 });
 
@@ -641,6 +645,100 @@ ipcMain.handle('share-via-system', async (event, text) => {
         }
     } catch (error) {
         console.error('System share error:', error);
+        return { success: false, error: error.message };
+    }
+});
+
+// ============================================================================
+// BACKUP EXPORT/IMPORT
+// ============================================================================
+
+// IPC handler for exporting collections backup
+// Parameters: collections (array of collection objects)
+// Returns: Object with success flag and error message if failed
+ipcMain.handle('export-backup', async (event, collections) => {
+    try {
+        const dialog = require('electron').dialog;
+        const fs = require('fs');
+        const path = require('path');
+
+        // Show save dialog for backup file
+        const result = await dialog.showSaveDialog(mainWindow, {
+            title: 'Exportar Backup de Colecciones',
+            defaultPath: 'ARIA-Music-Backup.json',
+            filters: [
+                { name: 'JSON Files', extensions: ['json'] },
+                { name: 'All Files', extensions: ['*'] }
+            ]
+        });
+
+        if (result.canceled || !result.filePath) {
+            return { success: false, error: 'Dialog canceled' };
+        }
+
+        // Prepare backup data with collections and their tracks
+        const backupData = {
+            version: '1.0',
+            exportDate: new Date().toISOString(),
+            collections: collections.map(collection => ({
+                name: collection.name,
+                playlist: collection.playlist.map(track => ({
+                    path: track.path,
+                    fileName: track.fileName,
+                    title: track.title,
+                    artist: track.artist,
+                    album: track.album,
+                    duration: track.duration,
+                    coverPath: track.coverPath,
+                    coverData: track.coverData
+                }))
+            }))
+        };
+
+        // Write backup file
+        fs.writeFileSync(result.filePath, JSON.stringify(backupData, null, 2));
+
+        return { success: true, filePath: result.filePath };
+    } catch (error) {
+        console.error('Backup export error:', error);
+        return { success: false, error: error.message };
+    }
+});
+
+// IPC handler for importing collections backup
+// Returns: Object with success flag and collections data
+ipcMain.handle('import-backup', async () => {
+    try {
+        const dialog = require('electron').dialog;
+        const fs = require('fs');
+
+        // Show open dialog for backup file
+        const result = await dialog.showOpenDialog(mainWindow, {
+            title: 'Importar Backup de Colecciones',
+            properties: ['openFile'],
+            filters: [
+                { name: 'JSON Files', extensions: ['json'] },
+                { name: 'All Files', extensions: ['*'] }
+            ]
+        });
+
+        if (result.canceled || !result.filePaths || result.filePaths.length === 0) {
+            return { success: false, error: 'Dialog canceled' };
+        }
+
+        const filePath = result.filePaths[0];
+
+        // Read and parse backup file
+        const backupData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+        // Validate backup structure
+        if (!backupData.collections || !Array.isArray(backupData.collections)) {
+            return { success: false, error: 'Invalid backup file structure' };
+        }
+
+        return { success: true, collections: backupData.collections };
+    } catch (error) {
+        console.error('Backup import error:', error);
         return { success: false, error: error.message };
     }
 });

@@ -360,6 +360,11 @@ function initEventListeners() {
             );
             document.getElementById('volumeIcon').style.color = '';
         }
+        // Update volume percentage display
+        const volumePercentage = document.getElementById('volumePercentage');
+        if (volumePercentage) {
+            volumePercentage.textContent = volumeSlider.value + '%';
+        }
     });
 
     // Volume slider - scroll wheel to adjust volume
@@ -377,6 +382,11 @@ function initEventListeners() {
                 'M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z'
             );
             document.getElementById('volumeIcon').style.color = '';
+        }
+        // Update volume percentage display
+        const volumePercentage = document.getElementById('volumePercentage');
+        if (volumePercentage) {
+            volumePercentage.textContent = newValue + '%';
         }
     });
 
@@ -429,6 +439,11 @@ function initEventListeners() {
             );
             document.getElementById('volumeIcon').style.color = '#888';
         }
+        // Update volume percentage display
+        const volumePercentage = document.getElementById('volumePercentage');
+        if (volumePercentage) {
+            volumePercentage.textContent = volumeSlider.value + '%';
+        }
     });
 
     // Click cover art to change it directly
@@ -475,10 +490,33 @@ function initEventListeners() {
         helpModal.style.display = 'flex';
     });
 
-    // Close help modal
-    closeHelpModal.addEventListener('click', () => {
-        helpModal.style.display = 'none';
+    // Close help modal when clicking outside the content
+    helpModal.addEventListener('click', (e) => {
+        if (e.target === helpModal) {
+            helpModal.style.display = 'none';
+        }
     });
+
+    // Close help modal button
+    if (closeHelpModal) {
+        closeHelpModal.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            helpModal.style.display = 'none';
+        });
+    }
+
+    // Backup buttons
+    const exportBackupBtn = document.getElementById('exportBackupBtn');
+    const importBackupBtn = document.getElementById('importBackupBtn');
+
+    if (exportBackupBtn) {
+        exportBackupBtn.addEventListener('click', exportBackup);
+    }
+
+    if (importBackupBtn) {
+        importBackupBtn.addEventListener('click', importBackup);
+    }
 
     // Debug: capture all clicks to see what's being clicked
     document.addEventListener('click', (e) => {
@@ -1175,7 +1213,7 @@ function playFromFavoritesQueue(queueIndex) {
 // This is the main function for starting playback of a track
 // Parameters:
 //   - index: Integer index of the track in the playlist array
-function playTrack(index) {
+async function playTrack(index) {
     console.log('playTrack() called with index:', index, 'playlist.length:', playlist.length);
     if (index < 0 || index >= playlist.length) {
         console.log('playTrack() returning: invalid index');
@@ -1215,6 +1253,19 @@ function playTrack(index) {
 
     audioElement1.play();                        // Start playback
     isPlaying = true;                            // Update playing state
+
+    // Get audio quality info dynamically when playing
+    try {
+        const audioInfo = await ipcRenderer.invoke('get-audio-duration', track.path);
+        if (audioInfo) {
+            track.bitrate = audioInfo.bitrate;
+            track.sampleRate = audioInfo.sampleRate;
+            console.log('Audio quality:', track.bitrate, 'kbps', track.sampleRate, 'Hz');
+            renderPlaylist();  // Update playlist to show quality info
+        }
+    } catch (error) {
+        console.error('Error getting audio quality:', error);
+    }
 
     // If this is a recording with stored duration, use it for seek slider
     if (track.recordingDuration) {
@@ -1356,6 +1407,7 @@ function play() {
         audioElement1.play();           // Resume current track
         isPlaying = true;
         updatePlayPauseButtons();
+        renderPlaylist();  // Update playlist to show/hide quality info
     } else if (playlist.length > 0) {
         playTrack(0);  // Play first track
     }
@@ -1371,6 +1423,7 @@ function pause() {
     audioElement1.pause();
     isPlaying = false;
     updatePlayPauseButtons();
+    renderPlaylist();  // Update playlist to hide quality info
 }
 
 // Stop playback and reset to beginning
@@ -1504,6 +1557,10 @@ function renderPlaylist() {
             '<svg class="heart-icon" viewBox="0 0 24 24" width="16" height="16" fill="#ff6b35"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>' :
             '<svg class="heart-icon" viewBox="0 0 24 24" width="16" height="16" fill="#666"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
 
+        // Add audio quality info only for playing track
+        const qualityInfo = (index === currentTrackIndex && isPlaying) ?
+            `<span class="playlist-item-quality" style="font-size: 11px; color: #888; margin-left: 8px;">${track.bitrate || '320'}kbps ${track.sampleRate || '44.1'}kHz</span>` : '';
+
         item.innerHTML = `
             <span class="playlist-item-number">
                 <span class="playlist-item-volume-icon">
@@ -1514,6 +1571,7 @@ function renderPlaylist() {
             <span class="playlist-item-favorite" data-index="${index}">${heartIcon}</span>
             <span class="playlist-item-title">${track.title || track.fileName}</span>
             <span class="playlist-item-duration">${track.duration || ''}</span>
+            ${qualityInfo}
         `;
 
         // Handle click: toggle favorite if heart clicked, play track otherwise
@@ -1939,7 +1997,7 @@ async function playFileFromPath(filePath) {
     const fileName = filePath.split('/').pop();
     const path = require('path');
 
-    // Get duration for audio file
+    // Get duration and audio quality for audio file
     const tempAudio = new Audio(`file://${filePath}`);
     await new Promise((resolve) => {
         tempAudio.addEventListener('loadedmetadata', () => {
@@ -2199,6 +2257,27 @@ function updateLanguage() {
         }
         if (document.getElementById('playFavoritesText')) {
             document.getElementById('playFavoritesText').textContent = t.playFavorites;
+        }
+        if (document.getElementById('backupTitle')) {
+            document.getElementById('backupTitle').textContent = t.backupTitle;
+        }
+        if (document.getElementById('backupExportDesc')) {
+            document.getElementById('backupExportDesc').textContent = t.backupExportDesc;
+        }
+        if (document.getElementById('exportBackupBtn')) {
+            document.getElementById('exportBackupBtn').textContent = t.backupExport;
+        }
+        if (document.getElementById('importBackupBtn')) {
+            document.getElementById('importBackupBtn').textContent = t.backupImport;
+        }
+        if (document.getElementById('learnMoreLink')) {
+            document.getElementById('learnMoreLink').textContent = t.learnMore;
+        }
+        if (document.getElementById('creditsText')) {
+            document.getElementById('creditsText').textContent = t.credits;
+        }
+        if (document.getElementById('contactText')) {
+            document.getElementById('contactText').textContent = t.contact;
         }
 
         // Update empty collections message
@@ -2550,6 +2629,43 @@ function showShareModal(index) {
 // Hide share modal
 function hideShareModal() {
     shareModal.style.display = 'none';
+}
+
+// Export collections backup
+async function exportBackup() {
+    try {
+        const t = translations[currentLanguage];
+        const result = await ipcRenderer.invoke('export-backup', collections);
+        if (result.success) {
+            alert(t.backupSuccess);
+        } else {
+            alert(t.backupError + ': ' + result.error);
+        }
+    } catch (error) {
+        console.error('Error exporting backup:', error);
+        alert(translations[currentLanguage].backupError + ': ' + error.message);
+    }
+}
+
+// Import collections backup
+async function importBackup() {
+    try {
+        const t = translations[currentLanguage];
+        const result = await ipcRenderer.invoke('import-backup');
+        if (result.success && result.collections) {
+            collections = result.collections;
+            currentCollectionIndex = 0;
+            playlist = collections[0]?.playlist || [];
+            renderCollections();
+            renderPlaylist();
+            alert(t.backupImportSuccess);
+        } else {
+            alert(t.backupImportError + ': ' + (result.error || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error importing backup:', error);
+        alert(translations[currentLanguage].backupImportError + ': ' + error.message);
+    }
 }
 
 // Share via Facebook
