@@ -1,4 +1,26 @@
+/*******************************************************************************
+ * TRANSLATIONS.JS - Multilingual Support
+ *******************************************************************************
+ * This file contains translation strings for the audio player application.
+ * Supports 9 languages: Spanish (es), English (en), Portuguese (pt), French (fr),
+ * German (de), Italian (it), Russian (ru), Chinese (zh), Japanese (ja).
+ * 
+ * Structure:
+ * - translations object with language codes as keys (es, en, pt, etc.)
+ * - Each language object contains key-value pairs for UI text
+ * - Keys are descriptive (e.g., 'title', 'addFiles', 'play')
+ * - Values are translated strings for that language
+ * 
+ * Usage:
+ * - Current language is stored in currentLanguage variable
+ * - updateLanguage() function in renderer.js updates UI text
+ * - Translation keys are accessed via translations[currentLanguage][key]
+ *******************************************************************************/
+
 const translations = {
+    /***************************************************************************
+     * SPANISH (es) - Default language
+     ***************************************************************************/
     es: {
         title: "PMOS Music",
         noCover: "Sin Carátula",
@@ -80,6 +102,9 @@ const translations = {
         metadataCancel: "Cancelar",
         metadataNoCover: "Sin carátula"
     },
+    /***************************************************************************
+     * ENGLISH (en)
+     ***************************************************************************/
     en: {
         title: "PMOS Music",
         noCover: "No Cover",
@@ -161,6 +186,9 @@ const translations = {
         metadataCancel: "Cancel",
         metadataNoCover: "No cover"
     },
+    /***************************************************************************
+     * PORTUGUESE (pt)
+     ***************************************************************************/
     pt: {
         title: "AudioPlayer Universal",
         noCover: "Sem Capa",
@@ -243,6 +271,9 @@ const translations = {
         metadataCancel: "Cancelar",
         metadataNoCover: "Sem capa"
     },
+    /***************************************************************************
+     * FRENCH (fr)
+     ***************************************************************************/
     fr: {
         title: "AudioPlayer Universal",
         noCover: "Pas de couverture",
@@ -325,6 +356,9 @@ const translations = {
         metadataCancel: "Annuler",
         metadataNoCover: "Pas de pochette"
     },
+    /***************************************************************************
+     * GERMAN (de)
+     ***************************************************************************/
     de: {
         title: "AudioPlayer Universal",
         noCover: "Kein Cover",
@@ -407,6 +441,9 @@ const translations = {
         metadataCancel: "Abbrechen",
         metadataNoCover: "Kein Cover"
     },
+    /***************************************************************************
+     * ITALIAN (it)
+     ***************************************************************************/
     it: {
         title: "AudioPlayer Universal",
         noCover: "Nessuna copertina",
@@ -489,6 +526,9 @@ const translations = {
         metadataCancel: "Annulla",
         metadataNoCover: "Nessuna copertina"
     },
+    /***************************************************************************
+     * RUSSIAN (ru)
+     ***************************************************************************/
     ru: {
         title: "AudioPlayer Universal",
         noCover: "Нет обложки",
@@ -571,6 +611,9 @@ const translations = {
         metadataCancel: "Отмена",
         metadataNoCover: "Нет обложки"
     },
+    /***************************************************************************
+     * CHINESE (zh)
+     ***************************************************************************/
     zh: {
         title: "AudioPlayer Universal",
         noCover: "无封面",
@@ -653,6 +696,9 @@ const translations = {
         metadataCancel: "取消",
         metadataNoCover: "无封面"
     },
+    /***************************************************************************
+     * JAPANESE (ja)
+     ***************************************************************************/
     ja: {
         title: "AudioPlayer Universal",
         noCover: "カバーなし",
@@ -736,3 +782,16 @@ const translations = {
         metadataNoCover: "カバーなし"
     }
 };
+
+/*******************************************************************************
+ * CURRENT LANGUAGE VARIABLE
+ *******************************************************************************
+ * Stores the currently selected language code.
+ * Default value is 'es' (Spanish).
+ * This variable is used by the updateLanguage() function in renderer.js
+ * to retrieve the appropriate translation strings from the translations object.
+ * 
+ * Valid values: 'es', 'en', 'pt', 'fr', 'de', 'it', 'ru', 'zh', 'ja'
+ *******************************************************************************/
+
+// Note: currentLanguage variable is declared in renderer.js to avoid duplicate declaration error

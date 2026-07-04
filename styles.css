@@ -877,6 +877,24 @@ body {
     overflow: hidden;
 }
 
+/* When collections are collapsed, playlist should take full height */
+.collections.collapsed ~ .playlist {
+    max-height: 100%;
+}
+
+/* Playlist collapsed state */
+.playlist.collapsed {
+    max-height: 0;
+    flex: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+/* When playlist is collapsed, collections should take full height */
+.playlist.collapsed ~ .collections {
+    max-height: 100%;
+}
+
 /* Custom scrollbar for collections */
 .collections::-webkit-scrollbar {
     width: 8px;

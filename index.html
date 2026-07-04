@@ -88,7 +88,7 @@ Key Features:
         -->
         <div class="playlist-container">
             <!-- Collections header with count and collapse button -->
-            <div class="playlist-header">
+            <div class="playlist-header" id="collectionsHeader" style="cursor: pointer;">
                 <div class="playlist-header-title-group">
                     <span>Colecciones</span>
                     <span class="playlist-count" id="playlistCount">0</span>
@@ -102,7 +102,7 @@ Key Features:
                 <div class="empty-playlist">No hay colecciones</div>
             </div>
             <!-- Playlist header -->
-            <div class="playlist-header" style="margin-top: 10px;">Lista de Reproducción</div>
+            <div class="playlist-header" id="playlistHeader" style="margin-top: 10px; cursor: pointer;">Lista de Reproducción</div>
             <!-- Playlist - dynamically populated by JavaScript based on selected collection -->
             <div class="playlist" id="playlist">
                 <div class="empty-playlist">Selecciona una colección</div>

@@ -84,7 +84,8 @@ let coverArt, trackTitle, trackArtist, trackAlbum, seekSlider, currentTimeEl, to
 let playBtn, pauseBtn, stopBtn, previousBtn, nextBtn, shuffleBtn, repeatBtn, recordBtn;
 
 // Volume and playlist UI elements
-let volumeSlider, micVolumeSlider, micVolumeContainer, collectionsEl, playlistEl, playlistHeader;
+let volumeSlider, micVolumeSlider, micVolumeContainer, collectionsEl, playlistEl;
+let playlistHeader, collectionsHeader;
 
 // Visualizer canvas for spectrum display
 let visualizerCanvas, canvasCtx;
@@ -181,7 +182,8 @@ function initDOMElements() {
     micVolumeContainer = document.getElementById('micVolumeContainer');
     collectionsEl = document.getElementById('collections');
     playlistEl = document.getElementById('playlist');
-    playlistHeader = document.querySelector('.playlist-header');
+    collectionsHeader = document.getElementById('collectionsHeader');
+    playlistHeader = document.getElementById('playlistHeader');
 
     // Visualizer canvas for spectrum display
     visualizerCanvas = document.getElementById('visualizerCanvas');
@@ -207,7 +209,20 @@ function initDOMElements() {
 
     // Add collapse button listener
     if (collapseCollectionsBtn) {
-        collapseCollectionsBtn.addEventListener('click', toggleCollectionsCollapse);
+        collapseCollectionsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleCollectionsCollapse();
+        });
+    }
+
+    // Add click listener to collections header to toggle collapse
+    if (collectionsHeader) {
+        collectionsHeader.addEventListener('click', toggleCollectionsCollapse);
+    }
+
+    // Add click listener to playlist header to toggle collapse
+    if (playlistHeader) {
+        playlistHeader.addEventListener('click', togglePlaylistCollapse);
     }
 
     // Language selector dropdown for UI translation
@@ -1684,6 +1699,14 @@ function toggleCollectionsCollapse() {
     }
 }
 
+// Toggle playlist collapse/expand
+function togglePlaylistCollapse() {
+    const playlistEl = document.getElementById('playlist');
+    if (playlistEl) {
+        playlistEl.classList.toggle('collapsed');
+    }
+}
+
 // Toggle audio recording on/off
 // CRITICAL: DO NOT MODIFY THIS FUNCTION OR ITS LOGIC
 // This function handles the complete recording workflow including:
@@ -2108,7 +2131,7 @@ function updateLanguage() {
         if (editMetadataBtn) editMetadataBtn.textContent = t.editMetadata;
 
         // Update collections header
-        if (playlistHeader) playlistHeader.textContent = t.collections;
+        if (collectionsHeader) collectionsHeader.textContent = t.collections;
 
         // Update empty collections message
         if (collectionsEl) {
@@ -2139,9 +2162,8 @@ function updateLanguage() {
         if (nextBtn) nextBtn.title = t.next;
 
         // Update playlist header (Lista de Reproducción)
-        const playlistHeaderEl = document.querySelector('.playlist-header');
-        if (playlistHeaderEl && playlistHeaderEl.childNodes[0]) {
-            playlistHeaderEl.childNodes[0].textContent = t.playlistHeader;
+        if (playlistHeader) {
+            playlistHeader.textContent = t.playlistHeader;
         }
 
         // Update favorites header
