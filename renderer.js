@@ -102,6 +102,9 @@ let contextMenu, collectionContextMenu;
 // Conversion modal elements - for audio conversion feature
 let conversionModal, progressModal, currentFileName, currentFormat, targetFormat, quality, outputPath, progressFill, progressText;
 
+// Share modal elements - for sharing tracks
+let shareModal, shareTrackName, closeShareModal;
+
 // Help modal elements
 let helpModal, closeHelpModal, helpBtn, helpBtnTop;
 
@@ -196,6 +199,7 @@ function initDOMElements() {
 
     // Collapse button for collections
     const collapseCollectionsBtn = document.getElementById('collapseCollectionsBtn');
+    const collapsePlaylistBtn = document.getElementById('collapsePlaylistBtn');
 
     // Ensure addFilesBtn is always enabled
     if (addFilesBtn) {
@@ -212,6 +216,14 @@ function initDOMElements() {
         collapseCollectionsBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             toggleCollectionsCollapse();
+        });
+    }
+
+    // Add collapse button listener for playlist
+    if (collapsePlaylistBtn) {
+        collapsePlaylistBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePlaylistCollapse();
         });
     }
 
@@ -242,6 +254,11 @@ function initDOMElements() {
     outputPath = document.getElementById('outputPath');
     progressFill = document.getElementById('progressFill');
     progressText = document.getElementById('progressText');
+
+    // Share modal elements - for sharing tracks
+    shareModal = document.getElementById('shareModal');
+    shareTrackName = document.getElementById('shareTrackName');
+    closeShareModal = document.getElementById('closeShareModal');
 
     // Help modal elements - displays keyboard shortcuts and language selector
     helpModal = document.getElementById('helpModal');
@@ -541,6 +558,13 @@ function initEventListeners() {
         hideContextMenu();
     });
 
+    document.getElementById('contextShare').addEventListener('click', () => {
+        if (contextMenuIndex >= 0) {
+            showShareModal(contextMenuIndex);
+        }
+        hideContextMenu();
+    });
+
     document.getElementById('contextRemove').addEventListener('click', () => {
         if (contextMenuIndex >= 0) {
             collections[currentCollectionIndex].playlist.splice(contextMenuIndex, 1);
@@ -598,6 +622,12 @@ function initEventListeners() {
     // Conversion modal handlers
     document.getElementById('closeConversionModal').addEventListener('click', hideConversionModal);
     document.getElementById('cancelConversion').addEventListener('click', hideConversionModal);
+
+    // Share modal handlers
+    closeShareModal.addEventListener('click', hideShareModal);
+    document.getElementById('shareFacebook').addEventListener('click', () => shareViaFacebook(contextMenuIndex));
+    document.getElementById('shareWhatsApp').addEventListener('click', () => shareViaWhatsApp(contextMenuIndex));
+    document.getElementById('shareSearchApp').addEventListener('click', () => shareViaSearchApp(contextMenuIndex));
     document.getElementById('browseOutputPath').addEventListener('click', async () => {
         const savePath = await ipcRenderer.invoke('select-save-path');
         if (savePath) {
@@ -1171,8 +1201,9 @@ function playTrack(index) {
     audioElement1.currentTime = 0;  // Reset playback position
     audioElement2.currentTime = 0;
 
-    // Reset gain nodes to default values
-    gainNode1.gain.value = 1;  // Full volume for main track
+    // Reset gain nodes to current volume setting
+    const currentVolume = volumeSlider ? volumeSlider.value / 100 : 1;
+    gainNode1.gain.value = currentVolume;  // Use current volume for main track
     gainNode2.gain.value = 0;  // Muted for crossfade track
 
     audioElement1.src = `file://${track.path}`;  // Set audio source to file path
@@ -1474,7 +1505,12 @@ function renderPlaylist() {
             '<svg class="heart-icon" viewBox="0 0 24 24" width="16" height="16" fill="#666"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
 
         item.innerHTML = `
-            <span class="playlist-item-number">${index + 1}</span>
+            <span class="playlist-item-number">
+                <span class="playlist-item-volume-icon">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                </span>
+                <span class="playlist-item-number-text">${index + 1}</span>
+            </span>
             <span class="playlist-item-favorite" data-index="${index}">${heartIcon}</span>
             <span class="playlist-item-title">${track.title || track.fileName}</span>
             <span class="playlist-item-duration">${track.duration || ''}</span>
@@ -1702,8 +1738,10 @@ function toggleCollectionsCollapse() {
 // Toggle playlist collapse/expand
 function togglePlaylistCollapse() {
     const playlistEl = document.getElementById('playlist');
-    if (playlistEl) {
+    const collapseBtn = document.getElementById('collapsePlaylistBtn');
+    if (playlistEl && collapseBtn) {
         playlistEl.classList.toggle('collapsed');
+        collapseBtn.classList.toggle('collapsed');
     }
 }
 
@@ -1893,7 +1931,8 @@ async function toggleRecording() {
 }
 
 // Play a file from its file path (when opened via double-click on file)
-// This function adds the file to the current collection and plays it
+// This function checks if file exists in any collection, if yes plays from there
+// If not, adds it to "Archivos Individuales" collection
 async function playFileFromPath(filePath) {
     console.log('playFileFromPath called with:', filePath);
 
@@ -1925,43 +1964,57 @@ async function playFileFromPath(filePath) {
         duration: duration
     };
 
-    // If no collections exist, create one
-    if (collections.length === 0) {
-        collections.push({
-            name: 'Archivos Individuales',
-            playlist: []
-        });
-        currentCollectionIndex = 0;
-        playlist = collections[0].playlist;
-        console.log('Created first collection');
+    // Search for file in all collections
+    let foundCollectionIndex = -1;
+    let foundTrackIndex = -1;
+
+    for (let i = 0; i < collections.length; i++) {
+        const existingTrack = collections[i].playlist.find(t => t.path === filePath);
+        if (existingTrack) {
+            foundCollectionIndex = i;
+            foundTrackIndex = collections[i].playlist.findIndex(t => t.path === filePath);
+            console.log('File found in collection:', collections[i].name, 'at index:', foundTrackIndex);
+            break;
+        }
     }
 
-    // Check if file already exists in current collection
-    const existingFile = playlist.find(t => t.path === filePath);
-    if (existingFile) {
-        console.log('File already exists in current collection, just playing it');
-        const trackIndex = playlist.findIndex(t => t.path === filePath);
+    if (foundCollectionIndex >= 0) {
+        // File exists in a collection, switch to it and play
+        currentCollectionIndex = foundCollectionIndex;
+        playlist = collections[currentCollectionIndex].playlist;
         renderCollections();
         renderPlaylist();
-        playTrack(trackIndex);
+        playTrack(foundTrackIndex);
         return;
     }
 
-    // Add file to current collection
-    playlist.push(track);
-    console.log('Added file to current collection, new playlist length:', playlist.length);
+    // File not found in any collection, add to "Archivos Individuales"
+    console.log('File not found in any collection, adding to Archivos Individuales');
 
-    // Find the track index and play it
-    const trackIndex = playlist.findIndex(t => t.path === filePath);
-    console.log('Track index:', trackIndex);
-    if (trackIndex >= 0) {
-        renderCollections();
-        renderPlaylist();
-        console.log('Calling playTrack with index:', trackIndex);
-        playTrack(trackIndex);
-    } else {
-        console.error('Track not found in playlist');
+    // Find or create "Archivos Individuales" collection
+    const individualFilesName = translations[currentLanguage].individualFiles;
+    let individualFilesIndex = collections.findIndex(c => c.name === individualFilesName);
+    if (individualFilesIndex < 0) {
+        // Create the collection if it doesn't exist
+        collections.push({
+            name: individualFilesName,
+            playlist: []
+        });
+        individualFilesIndex = collections.length - 1;
+        console.log('Created Archivos Individuales collection');
     }
+
+    // Add track to Archivos Individuales
+    collections[individualFilesIndex].playlist.push(track);
+
+    // Switch to that collection and play the track
+    currentCollectionIndex = individualFilesIndex;
+    playlist = collections[currentCollectionIndex].playlist;
+    const trackIndex = playlist.findIndex(t => t.path === filePath);
+
+    renderCollections();
+    renderPlaylist();
+    playTrack(trackIndex);
 }
 
 // Build a temporary playlist of only favorited tracks and start playback
@@ -2004,7 +2057,7 @@ async function addFiles() {
     // If no collections exist, create one automatically
     if (collections.length === 0) {
         collections.push({
-            name: 'Archivos Individuales',
+            name: translations[currentLanguage].individualFiles,
             playlist: []
         });
         currentCollectionIndex = 0;
@@ -2132,6 +2185,21 @@ function updateLanguage() {
 
         // Update collections header
         if (collectionsHeader) collectionsHeader.textContent = t.collections;
+        if (document.getElementById('collectionsHeaderText')) {
+            document.getElementById('collectionsHeaderText').textContent = t.collectionsHeader;
+        }
+        if (document.getElementById('playlistHeaderText')) {
+            document.getElementById('playlistHeaderText').textContent = t.playlistHeader;
+        }
+        if (document.getElementById('collapseCollectionsBtn')) {
+            document.getElementById('collapseCollectionsBtn').title = t.collapseCollections;
+        }
+        if (document.getElementById('collapsePlaylistBtn')) {
+            document.getElementById('collapsePlaylistBtn').title = t.collapsePlaylist;
+        }
+        if (document.getElementById('playFavoritesText')) {
+            document.getElementById('playFavoritesText').textContent = t.playFavorites;
+        }
 
         // Update empty collections message
         if (collectionsEl) {
@@ -2470,6 +2538,50 @@ function showConversionModal(index) {
 // Hide conversion modal
 function hideConversionModal() {
     conversionModal.style.display = 'none';
+}
+
+// Show share modal with track information
+function showShareModal(index) {
+    const track = playlist[index];
+    shareTrackName.textContent = `${track.title} - ${track.artist}`;
+    shareModal.style.display = 'flex';
+}
+
+// Hide share modal
+function hideShareModal() {
+    shareModal.style.display = 'none';
+}
+
+// Share via Facebook
+function shareViaFacebook(index) {
+    const track = playlist[index];
+    const text = encodeURIComponent(`Escuchando "${track.title}" de ${track.artist} en ARIA Music`);
+    window.open(`https://www.facebook.com/sharer/sharer.php?quote=${text}`, '_blank');
+    hideShareModal();
+}
+
+// Share via WhatsApp
+function shareViaWhatsApp(index) {
+    const track = playlist[index];
+    const text = encodeURIComponent(`Escuchando "${track.title}" de ${track.artist} en ARIA Music`);
+    window.open(`https://web.whatsapp.com/send?text=${text}`, '_blank');
+    hideShareModal();
+}
+
+// Share via Search App - opens system dialog to select app for sharing
+function shareViaSearchApp(index) {
+    const track = playlist[index];
+    const text = `Escuchando "${track.title}" de ${track.artist} en ARIA Music`;
+    
+    // Use IPC to open system share dialog
+    ipcRenderer.invoke('share-via-system', text).then((result) => {
+        if (!result.success) {
+            alert('No se pudo abrir el diálogo de compartir del sistema. Error: ' + result.error);
+        }
+    }).catch((error) => {
+        alert('Error al compartir: ' + error.message);
+    });
+    hideShareModal();
 }
 
 // ============================================================================

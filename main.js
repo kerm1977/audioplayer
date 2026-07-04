@@ -41,7 +41,7 @@ function createWindow() {
         minHeight: 660,     // Minimum height to prevent UI layout deformation
         maxWidth: 1600,     // Maximum width constraint
         maxHeight: 1080,    // Maximum height constraint
-        title: 'PMOS Music',  // Window title displayed in title bar
+        title: 'ARIA Music',  // Window title displayed in title bar
         frame: false,         // Remove native OS frame for custom rounded corners
         transparent: true,    // Enable transparency for custom rounded corner effect
         webPreferences: {
@@ -126,7 +126,7 @@ function createMenu() {
             label: 'Ayuda',  // Help menu label
             submenu: [
                 {
-                    label: 'Acerca de PMOS Music',  // About menu item
+                    label: 'Acerca de ARIA Music',  // About menu item
                     click: () => { mainWindow.webContents.send('menu-open-help'); }  // Send IPC message to renderer
                 },
                 { type: 'separator' },  // Visual separator line
@@ -576,4 +576,71 @@ ipcMain.handle('convert-audio', async (event, inputPath, outputPath, format, qua
             })
             .save(absoluteOutputPath);  // Start the conversion and save to output path
     });
+});
+
+// ============================================================================
+// IPC HANDLERS - SYSTEM SHARE
+// ============================================================================
+
+// IPC handler for sharing via system dialog
+// Parameters: text (text to share)
+// Returns: Object with success flag
+ipcMain.handle('share-via-system', async (event, text) => {
+    try {
+        const { exec } = require('child_process');
+        const util = require('util');
+        const execPromise = util.promisify(exec);
+        const os = require('os');
+        const platform = os.platform();
+
+        if (platform === 'linux') {
+            // Try different methods for Linux
+            // Method 1: Try using xdg-open with a mailto link (most universal)
+            try {
+                const subject = encodeURIComponent('Compartir desde ARIA Music');
+                const body = encodeURIComponent(text);
+                await execPromise(`xdg-open "mailto:?subject=${subject}&body=${body}"`);
+                return { success: true };
+            } catch (e) {
+                // Method 2: Try zenity for a simple dialog
+                try {
+                    await execPromise(`zenity --info --text="${text}" --title="Compartir"`);
+                    return { success: true };
+                } catch (e2) {
+                    // Method 3: Try kdialog for KDE
+                    try {
+                        await execPromise(`kdialog --msgbox "${text}" --title="Compartir"`);
+                        return { success: true };
+                    } catch (e3) {
+                        return { success: false, error: 'No se encontró método de compartir en el sistema. Instala xdg-utils, zenity o kdialog.' };
+                    }
+                }
+            }
+        } else if (platform === 'darwin') {
+            // macOS - use open command
+            try {
+                const subject = encodeURIComponent('Compartir desde ARIA Music');
+                const body = encodeURIComponent(text);
+                await execPromise(`open "mailto:?subject=${subject}&body=${body}"`);
+                return { success: true };
+            } catch (e) {
+                return { success: false, error: 'No se pudo abrir el cliente de correo en macOS.' };
+            }
+        } else if (platform === 'win32') {
+            // Windows - use start command
+            try {
+                const subject = encodeURIComponent('Compartir desde ARIA Music');
+                const body = encodeURIComponent(text);
+                await execPromise(`start "" "mailto:?subject=${subject}&body=${body}"`);
+                return { success: true };
+            } catch (e) {
+                return { success: false, error: 'No se pudo abrir el cliente de correo en Windows.' };
+            }
+        } else {
+            return { success: false, error: 'Plataforma no soportada para compartir.' };
+        }
+    } catch (error) {
+        console.error('System share error:', error);
+        return { success: false, error: error.message };
+    }
 });

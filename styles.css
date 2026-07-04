@@ -994,8 +994,17 @@ body {
 
 /* Currently playing track - orange highlight */
 .playlist-item.active {
-    background: #ff6b35;  /* Orange accent for active track */
+    background: rgba(255, 107, 53, 0.5);  /* Light orange accent for active track */
     color: white;
+}
+
+/* Ensure child elements don't override the active background */
+.playlist-item.active .playlist-item-number,
+.playlist-item.active .playlist-item-favorite,
+.playlist-item.active .playlist-item-title,
+.playlist-item.active .playlist-item-duration,
+.playlist-item.active .playlist-item-collection {
+    background: transparent;
 }
 
 /* Alternating row colors for better readability */
@@ -1028,6 +1037,23 @@ body {
     min-width: 20px;
     text-align: right;
     flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.playlist-item-number-text {
+    color: inherit;
+}
+
+/* Volume icon - hidden by default, shown for active track */
+.playlist-item-volume-icon {
+    display: none;
+    align-items: center;
+}
+
+.playlist-item.active .playlist-item-volume-icon {
+    display: flex;
 }
 
 .playlist-item.active .playlist-item-number {
@@ -1473,6 +1499,49 @@ body {
 
 .modal-btn.secondary:hover {
     background: #4a4a4a;
+}
+
+/* ============================================================================
+ * SHARE OPTIONS
+ * ============================================================================
+ * Share options grid for sharing tracks via different platforms.
+ */
+
+.share-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.share-option {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 10px;
+    background: #2d2d2d;
+    border: 1px solid #3a3a3a;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.share-option:hover {
+    background: #3a3a3a;
+    border-color: #ff6b35;
+    transform: translateY(-2px);
+}
+
+.share-option svg {
+    margin-bottom: 10px;
+    color: #ff6b35;
+}
+
+.share-option span {
+    font-size: 14px;
+    color: #e0e0e0;
+    text-align: center;
 }
 
 /* ============================================================================

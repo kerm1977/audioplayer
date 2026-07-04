@@ -22,7 +22,7 @@ const translations = {
      * SPANISH (es) - Default language
      ***************************************************************************/
     es: {
-        title: "PMOS Music",
+        title: "ARIA Music",
         noCover: "Sin Carátula",
         title_label: "Título",
         artist_label: "Artista",
@@ -42,7 +42,7 @@ const translations = {
         metadataNotImplemented: "Función de edición de metadatos - Por implementar",
         helpTitle: "Ayuda",
         languageLabel: "🌐 Idioma:",
-        helpInfoTitle: "PMOS Music",
+        helpInfoTitle: "ARIA Music",
         helpInfoDesc: "Reproductor de audio con soporte para múltiples formatos y conversión.",
         helpShortcuts: "Atajos de teclado:",
         shortcutSpace: "Espacio: Reproducir/Pausar",
@@ -100,13 +100,18 @@ const translations = {
         metadataApplyToCollection: "Aplicar a toda la colección",
         metadataSave: "Guardar",
         metadataCancel: "Cancelar",
-        metadataNoCover: "Sin carátula"
+        metadataNoCover: "Sin carátula",
+        collectionsHeader: "Colecciones",
+        collapseCollections: "Colapsar/Expandir Colecciones",
+        collapsePlaylist: "Colapsar/Expandir Lista de Reproducción",
+        individualFiles: "Archivos Individuales",
+        playFavorites: "Reproducir favoritos"
     },
     /***************************************************************************
      * ENGLISH (en)
      ***************************************************************************/
     en: {
-        title: "PMOS Music",
+        title: "ARIA Music",
         noCover: "No Cover",
         title_label: "Title",
         artist_label: "Artist",
@@ -126,7 +131,7 @@ const translations = {
         metadataNotImplemented: "Metadata editing feature - To be implemented",
         helpTitle: "Help",
         languageLabel: "🌐 Language:",
-        helpInfoTitle: "PMOS Music",
+        helpInfoTitle: "ARIA Music",
         helpInfoDesc: "Audio player with support for multiple formats and conversion.",
         helpShortcuts: "Keyboard shortcuts:",
         shortcutSpace: "Space: Play/Pause",
@@ -184,7 +189,12 @@ const translations = {
         metadataApplyToCollection: "Apply to entire collection",
         metadataSave: "Save",
         metadataCancel: "Cancel",
-        metadataNoCover: "No cover"
+        metadataNoCover: "No cover",
+        collectionsHeader: "Collections",
+        collapseCollections: "Collapse/Expand Collections",
+        collapsePlaylist: "Collapse/Expand Playlist",
+        individualFiles: "Individual Files",
+        playFavorites: "Play favorites"
     },
     /***************************************************************************
      * PORTUGUESE (pt)
@@ -269,7 +279,12 @@ const translations = {
         metadataApplyToCollection: "Aplicar a toda coleção",
         metadataSave: "Salvar",
         metadataCancel: "Cancelar",
-        metadataNoCover: "Sem capa"
+        metadataNoCover: "Sem capa",
+        collectionsHeader: "Coleções",
+        collapseCollections: "Recolher/Expandir Coleções",
+        collapsePlaylist: "Recolher/Expandir Lista de Reprodução",
+        individualFiles: "Arquivos Individuais",
+        playFavorites: "Reproduzir favoritos"
     },
     /***************************************************************************
      * FRENCH (fr)
@@ -354,7 +369,12 @@ const translations = {
         metadataApplyToCollection: "Appliquer à toute la collection",
         metadataSave: "Enregistrer",
         metadataCancel: "Annuler",
-        metadataNoCover: "Pas de pochette"
+        metadataNoCover: "Pas de pochette",
+        collectionsHeader: "Collections",
+        collapseCollections: "Réduire/Étendre Collections",
+        collapsePlaylist: "Réduire/Étendre Liste de lecture",
+        individualFiles: "Fichiers individuels",
+        playFavorites: "Lire les favoris"
     },
     /***************************************************************************
      * GERMAN (de)
@@ -439,7 +459,12 @@ const translations = {
         metadataApplyToCollection: "Auf gesamte Sammlung anwenden",
         metadataSave: "Speichern",
         metadataCancel: "Abbrechen",
-        metadataNoCover: "Kein Cover"
+        metadataNoCover: "Kein Cover",
+        collectionsHeader: "Sammlungen",
+        collapseCollections: "Sammlungen reduzieren/erweitern",
+        collapsePlaylist: "Wiedergabeliste reduzieren/erweitern",
+        individualFiles: "Einzelne Dateien",
+        playFavorites: "Favoriten abspielen"
     },
     /***************************************************************************
      * ITALIAN (it)
@@ -524,7 +549,12 @@ const translations = {
         metadataApplyToCollection: "Applica a tutta la raccolta",
         metadataSave: "Salva",
         metadataCancel: "Annulla",
-        metadataNoCover: "Nessuna copertina"
+        metadataNoCover: "Nessuna copertina",
+        collectionsHeader: "Raccolte",
+        collapseCollections: "Comprimi/Espandi Raccolte",
+        collapsePlaylist: "Comprimi/Espandi Playlist",
+        individualFiles: "File individuali",
+        playFavorites: "Riproduci preferiti"
     },
     /***************************************************************************
      * RUSSIAN (ru)
@@ -609,7 +639,12 @@ const translations = {
         metadataApplyToCollection: "Применить ко всей коллекции",
         metadataSave: "Сохранить",
         metadataCancel: "Отмена",
-        metadataNoCover: "Нет обложки"
+        metadataNoCover: "Нет обложки",
+        collectionsHeader: "Коллекции",
+        collapseCollections: "Свернуть/Развернуть Коллекции",
+        collapsePlaylist: "Свернуть/Развернуть Плейлист",
+        individualFiles: "Отдельные файлы",
+        playFavorites: "Воспроизвести избранное"
     },
     /***************************************************************************
      * CHINESE (zh)
@@ -694,7 +729,12 @@ const translations = {
         metadataApplyToCollection: "应用于整个收藏夹",
         metadataSave: "保存",
         metadataCancel: "取消",
-        metadataNoCover: "无封面"
+        metadataNoCover: "无封面",
+        collectionsHeader: "收藏夹",
+        collapseCollections: "折叠/展开 收藏夹",
+        collapsePlaylist: "折叠/展开 播放列表",
+        individualFiles: "单个文件",
+        playFavorites: "播放收藏"
     },
     /***************************************************************************
      * JAPANESE (ja)
@@ -779,7 +819,12 @@ const translations = {
         metadataApplyToCollection: "コレクション全体に適用",
         metadataSave: "保存",
         metadataCancel: "キャンセル",
-        metadataNoCover: "カバーなし"
+        metadataNoCover: "カバーなし",
+        collectionsHeader: "コレクション",
+        collapseCollections: "コレクションを折りたたむ/展開",
+        collapsePlaylist: "プレイリストを折りたたむ/展開",
+        individualFiles: "個別ファイル",
+        playFavorites: "お気に入りを再生"
     }
 };
 
