@@ -1,3 +1,3 @@
 #!/bin/bash
-cd /home/pmint/CascadeProjects/AudioPlayerElectron
+cd /home/pmint/CascadeProjects/audioplayer
 npx electron . "$@"

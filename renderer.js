@@ -1735,22 +1735,31 @@ function toggleFavoritePath(path) {
 // This function displays all favorited tracks from all collections in the favorites panel
 // Each item shows the track number, title, and collection name
 function renderFavorites() {
-    if (!favoritesList) return;  // Exit if favorites list element doesn't exist
+    console.log('renderFavorites called, favorites.size:', favorites.size, 'collections.length:', collections.length);
+    if (!favoritesList) {
+        console.log('favoritesList element not found');
+        return;  // Exit if favorites list element doesn't exist
+    }
     if (favorites.size === 0) {
         // Display message if no favorites exist
         favoritesList.innerHTML = '<div class="empty-favorites">No hay favoritos</div>';
+        console.log('No favorites to display');
     } else {
         favoritesList.innerHTML = '';  // Clear favorites list
         let favNumber = 0;  // Counter for favorite numbering
         // Collect all favorited tracks across all collections
         // Use a Set to avoid duplicates based on file path
         const seenPaths = new Set();
+        console.log('Iterating through collections to find favorites');
         collections.forEach((collection, collectionIndex) => {
+            console.log('Collection:', collection.name, 'playlist length:', collection.playlist.length);
             collection.playlist.forEach((track, trackIndex) => {
+                console.log('Track:', track.title || track.fileName, 'is favorite:', favorites.has(track.path));
                 if (!favorites.has(track.path)) return;
                 if (seenPaths.has(track.path)) return;  // Skip duplicates
                 seenPaths.add(track.path);
                 favNumber++;
+                console.log('Adding favorite:', track.title || track.fileName, 'from collection:', collection.name);
                 const item = document.createElement('div');
                 item.className = 'favorite-item';
                 // Highlight if this is the currently playing track
@@ -1771,6 +1780,7 @@ function renderFavorites() {
                 favoritesList.appendChild(item);
             });
         });
+        console.log('Total favorites rendered:', favNumber);
     }
     updateCounters();
 }
@@ -2800,6 +2810,7 @@ async function loadState() {
     // Restore favorites
     if (Array.isArray(state.favorites)) {
         favorites = new Set(state.favorites);
+        renderFavorites(); // Render favorites after loading from state
     }
 
     // Restore current collection
