@@ -220,6 +220,10 @@ app.on('window-all-closed', () => {
 // Called when user clicks the minimize button in custom title bar
 ipcMain.on('window-minimize', () => { if (mainWindow) mainWindow.minimize(); });
 
+// IPC handlers for fullscreen cover modal
+ipcMain.on('enter-fullscreen', () => { if (mainWindow) mainWindow.setFullScreen(true); });
+ipcMain.on('exit-fullscreen', () => { if (mainWindow) mainWindow.setFullScreen(false); });
+
 // Variables for custom maximize/restore functionality
 let savedBounds = null;        // Store window bounds before maximizing
 let isManuallyMaximized = false; // Track if window is in custom maximized state
@@ -361,6 +365,53 @@ ipcMain.handle('select-image', async () => {
         return result.filePaths[0];  // Return selected image path
     }
     return null;  // Return null if canceled
+});
+
+// ============================================================================
+// IPC HANDLERS - FILE LOCATION
+// ============================================================================
+
+// IPC handler for opening file location in file manager
+// Opens the folder containing the file and selects the file
+ipcMain.on('open-file-location', (event, filePath) => {
+    if (fs.existsSync(filePath)) {
+        const { shell } = require('electron');
+        shell.showItemInFolder(filePath);
+    }
+});
+
+// IPC handler for getting file statistics
+// Returns: Object with bitrate, sampleRate, and size
+ipcMain.handle('get-file-stats', async (event, filePath) => {
+    try {
+        const stats = fs.statSync(filePath);
+        const sizeMB = (stats.size / (1024 * 1024)).toFixed(2);
+        
+        // Try to get audio metadata using ffprobe if available
+        let bitrate = '-';
+        let sampleRate = '-';
+        
+        try {
+            const { execSync } = require('child_process');
+            const output = execSync(`ffprobe -v error -show_entries format=bit_rate,stream=sample_rate -of default=noprint_wrappers=1:nokey=1 "${filePath}"`, { encoding: 'utf8' });
+            const lines = output.trim().split('\n');
+            if (lines.length >= 2) {
+                bitrate = Math.round(parseInt(lines[0]) / 1000) + ' kbps';
+                sampleRate = lines[1] + ' Hz';
+            }
+        } catch (e) {
+            console.log('ffprobe not available or error:', e.message);
+        }
+        
+        return {
+            size: sizeMB + ' MB',
+            bitrate: bitrate,
+            sampleRate: sampleRate
+        };
+    } catch (error) {
+        console.error('Error getting file stats:', error);
+        return null;
+    }
 });
 
 // ============================================================================

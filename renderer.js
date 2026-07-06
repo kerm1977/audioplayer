@@ -85,7 +85,7 @@ let playBtn, pauseBtn, stopBtn, previousBtn, nextBtn, shuffleBtn, repeatBtn, rec
 
 // Volume and playlist UI elements
 let volumeSlider, micVolumeSlider, micVolumeContainer, collectionsEl, playlistEl;
-let playlistHeader, collectionsHeader;
+let playlistHeader, collectionsHeader, favoritesHeader;
 
 // Visualizer canvas for spectrum display
 let visualizerCanvas, canvasCtx;
@@ -108,8 +108,9 @@ let shareModal, shareTrackName, closeShareModal;
 // Help modal elements
 let helpModal, closeHelpModal, helpBtn, helpBtnTop;
 
-// Theme toggle button
+// Theme toggle buttons
 let themeBtnTop;
+let titleBarTheme;
 
 // Search elements
 let searchInput, searchInfo;
@@ -214,6 +215,33 @@ function initDOMElements() {
         addFolderBtn.style.opacity = '1';
     }
 
+    // Add collapse button listener for favorites
+    const collapseFavoritesBtn = document.getElementById('collapseFavoritesBtn');
+    favoritesHeader = document.getElementById('favoritesHeader');
+    if (collapseFavoritesBtn) {
+        collapseFavoritesBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            toggleFavoritesCollapse();
+        });
+    }
+    if (favoritesHeader) {
+        favoritesHeader.addEventListener('click', (e) => {
+            if (!e.target.closest('#playFavoritesBtn')) toggleFavoritesCollapse();
+        });
+        favoritesHeader.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const favListEl = document.getElementById('favoritesList');
+            if (e.deltaY > 0) {
+                favListEl.classList.remove('collapsed');
+                document.getElementById('collapseFavoritesBtn').classList.remove('collapsed');
+            } else {
+                favListEl.classList.add('collapsed');
+                document.getElementById('collapseFavoritesBtn').classList.add('collapsed');
+            }
+        }, { passive: false });
+    }
+
     // Add collapse button listener
     if (collapseCollectionsBtn) {
         collapseCollectionsBtn.addEventListener('click', (e) => {
@@ -233,23 +261,57 @@ function initDOMElements() {
     // Add click listener to collections header to toggle collapse
     if (collectionsHeader) {
         collectionsHeader.addEventListener('click', toggleCollectionsCollapse);
-        // Add wheel listener to toggle collapse with scroll
+        // Add wheel listener to expand on scroll down, collapse on scroll up
         collectionsHeader.addEventListener('wheel', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            toggleCollectionsCollapse();
+            const collectionsEl = document.getElementById('collections');
+            if (e.deltaY > 0) {
+                // Scroll down - expand
+                collectionsEl.classList.remove('collapsed');
+                document.getElementById('collapseCollectionsBtn').classList.remove('collapsed');
+            } else {
+                // Scroll up - collapse
+                collectionsEl.classList.add('collapsed');
+                document.getElementById('collapseCollectionsBtn').classList.add('collapsed');
+            }
         }, { passive: false });
+        // Add hover listener to collapse playlist when hovering collections
+        collectionsHeader.addEventListener('mouseenter', () => {
+            const playlistEl = document.getElementById('playlist');
+            if (playlistEl) {
+                playlistEl.classList.add('collapsed');
+                document.getElementById('collapsePlaylistBtn').classList.add('collapsed');
+            }
+        });
     }
 
     // Add click listener to playlist header to toggle collapse
     if (playlistHeader) {
         playlistHeader.addEventListener('click', togglePlaylistCollapse);
-        // Add wheel listener to toggle collapse with scroll
+        // Add wheel listener to expand on scroll down, collapse on scroll up
         playlistHeader.addEventListener('wheel', (e) => {
             e.preventDefault();
             e.stopPropagation();
-            togglePlaylistCollapse();
+            const playlistEl = document.getElementById('playlist');
+            if (e.deltaY > 0) {
+                // Scroll down - expand
+                playlistEl.classList.remove('collapsed');
+                document.getElementById('collapsePlaylistBtn').classList.remove('collapsed');
+            } else {
+                // Scroll up - collapse
+                playlistEl.classList.add('collapsed');
+                document.getElementById('collapsePlaylistBtn').classList.add('collapsed');
+            }
         }, { passive: false });
+        // Add hover listener to collapse collections when hovering playlist
+        playlistHeader.addEventListener('mouseenter', () => {
+            const collectionsEl = document.getElementById('collections');
+            if (collectionsEl) {
+                collectionsEl.classList.add('collapsed');
+                document.getElementById('collapseCollectionsBtn').classList.add('collapsed');
+            }
+        });
     }
 
     // Language selector dropdown for UI translation
@@ -275,13 +337,30 @@ function initDOMElements() {
     shareTrackName = document.getElementById('shareTrackName');
     closeShareModal = document.getElementById('closeShareModal');
 
+    // Info modal elements - displays track information
+    infoModal = document.getElementById('infoModal');
+    closeInfoModal = document.getElementById('closeInfoModal');
+    infoTrackName = document.getElementById('infoTrackName');
+    infoBitrate = document.getElementById('infoBitrate');
+    infoSampleRate = document.getElementById('infoSampleRate');
+    infoFileSize = document.getElementById('infoFileSize');
+    infoLocation = document.getElementById('infoLocation');
+    openLocationBtn = document.getElementById('openLocationBtn');
+
+    // Delete confirmation modal elements
+    deleteConfirmModal = document.getElementById('deleteConfirmModal');
+    closeDeleteConfirmModal = document.getElementById('closeDeleteConfirmModal');
+    confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
     // Help modal elements - displays keyboard shortcuts and language selector
     helpModal = document.getElementById('helpModal');
     closeHelpModal = document.getElementById('closeHelpModal');
     helpBtnTop = document.getElementById('helpBtnTop');
 
-    // Theme toggle button - switches between dark and light themes
+    // Theme toggle buttons - switches between dark and light themes
     themeBtnTop = document.getElementById('themeBtnTop');
+    titleBarTheme = document.getElementById('titleBarTheme');
 
     // Search bar elements - for filtering tracks
     searchInput = document.getElementById('searchInput');
@@ -464,16 +543,78 @@ function initEventListeners() {
         }
     });
 
-    // Click cover art to change it directly
-    coverArt.addEventListener('click', async () => {
+    // Click cover art to open fullscreen modal
+    coverArt.addEventListener('click', () => {
         if (currentTrackIndex < 0) return;
-        const imgPath = await ipcRenderer.invoke('select-image');
-        if (!imgPath) return;
-        const track = playlist[currentTrackIndex];
-        track.coverPath = imgPath;
-        track.coverData = null;
-        coverArt.innerHTML = `<img src="file://${imgPath}" alt="cover">`;
+        openCoverFullscreen();
     });
+
+    // Fullscreen cover modal controls
+    const coverFullscreenModal = document.getElementById('coverFullscreenModal');
+    const coverFullscreenClose = document.getElementById('coverFullscreenClose');
+    const coverFullscreenPrev = document.getElementById('coverFullscreenPrev');
+    const coverFullscreenPlay = document.getElementById('coverFullscreenPlay');
+    const coverFullscreenNext = document.getElementById('coverFullscreenNext');
+    const coverFullscreenControls = document.getElementById('coverFullscreenControls');
+
+    let coverHideTimer = null;
+
+    function resetCoverHideTimer() {
+        coverFullscreenControls.classList.remove('hidden');
+        clearTimeout(coverHideTimer);
+        coverHideTimer = setTimeout(() => {
+            coverFullscreenControls.classList.add('hidden');
+        }, 3000);
+    }
+
+    if (coverFullscreenModal) {
+        coverFullscreenModal.addEventListener('mousemove', resetCoverHideTimer);
+        coverFullscreenModal.addEventListener('click', (e) => {
+            if (e.target === coverFullscreenModal) resetCoverHideTimer();
+        });
+    }
+
+    if (coverFullscreenClose) {
+        coverFullscreenClose.addEventListener('click', () => {
+            coverFullscreenModal.classList.remove('active');
+            clearTimeout(coverHideTimer);
+            ipcRenderer.send('exit-fullscreen');
+        });
+    }
+
+    if (coverFullscreenPrev) {
+        coverFullscreenPrev.addEventListener('click', () => {
+            playPrevious();
+            updateCoverFullscreenInfo();
+            resetCoverHideTimer();
+        });
+    }
+
+    if (coverFullscreenPlay) {
+        coverFullscreenPlay.addEventListener('click', () => {
+            if (isPlaying) pause(); else play();
+            updateCoverFullscreenPlayIcon();
+            resetCoverHideTimer();
+        });
+    }
+
+    if (coverFullscreenNext) {
+        coverFullscreenNext.addEventListener('click', () => {
+            playNext();
+            updateCoverFullscreenInfo();
+            resetCoverHideTimer();
+        });
+    }
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && coverFullscreenModal && coverFullscreenModal.classList.contains('active')) {
+            coverFullscreenModal.classList.remove('active');
+            clearTimeout(coverHideTimer);
+            ipcRenderer.send('exit-fullscreen');
+        }
+    });
+
 
     // Action buttons
     addFilesBtn.addEventListener('click', addFiles);
@@ -508,9 +649,12 @@ function initEventListeners() {
         helpModal.style.display = 'flex';
     });
 
-    // Theme toggle button - switches between dark and light themes
+    // Theme toggle buttons - switches between dark and light themes
     if (themeBtnTop) {
         themeBtnTop.addEventListener('click', toggleTheme);
+    }
+    if (titleBarTheme) {
+        titleBarTheme.addEventListener('click', toggleTheme);
     }
 
     // Close help modal when clicking outside the content
@@ -626,19 +770,16 @@ function initEventListeners() {
         hideContextMenu();
     });
 
+    document.getElementById('contextInfo').addEventListener('click', () => {
+        if (contextMenuIndex >= 0) {
+            showInfoModal(contextMenuIndex);
+        }
+        hideContextMenu();
+    });
+
     document.getElementById('contextRemove').addEventListener('click', () => {
         if (contextMenuIndex >= 0) {
-            collections[currentCollectionIndex].playlist.splice(contextMenuIndex, 1);
-            playlist = collections[currentCollectionIndex].playlist;
-
-            if (currentTrackIndex === contextMenuIndex) {
-                stopPlayback();
-                currentTrackIndex = -1;
-            } else if (currentTrackIndex > contextMenuIndex) {
-                currentTrackIndex--;
-            }
-            renderPlaylist();
-            renderCollections();
+            deleteConfirmModal.style.display = 'flex';
         }
         hideContextMenu();
     });
@@ -750,6 +891,57 @@ function initEventListeners() {
     searchInput.addEventListener('input', (e) => {
         performSearch(e.target.value);
     });
+
+    // Info modal close button
+    if (closeInfoModal) {
+        closeInfoModal.addEventListener('click', () => {
+            infoModal.style.display = 'none';
+        });
+    }
+
+    // Open location button
+    if (openLocationBtn) {
+        openLocationBtn.addEventListener('click', () => {
+            if (contextMenuIndex >= 0) {
+                const track = playlist[contextMenuIndex];
+                ipcRenderer.send('open-file-location', track.path);
+            }
+        });
+    }
+
+    // Delete confirmation modal close button
+    if (closeDeleteConfirmModal) {
+        closeDeleteConfirmModal.addEventListener('click', () => {
+            deleteConfirmModal.style.display = 'none';
+        });
+    }
+
+    // Confirm delete button
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (contextMenuIndex >= 0) {
+                collections[currentCollectionIndex].playlist.splice(contextMenuIndex, 1);
+                playlist = collections[currentCollectionIndex].playlist;
+
+                if (currentTrackIndex === contextMenuIndex) {
+                    stopPlayback();
+                    currentTrackIndex = -1;
+                } else if (currentTrackIndex > contextMenuIndex) {
+                    currentTrackIndex--;
+                }
+                renderPlaylist();
+                renderCollections();
+            }
+            deleteConfirmModal.style.display = 'none';
+        });
+    }
+
+    // Cancel delete button
+    if (cancelDeleteBtn) {
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteConfirmModal.style.display = 'none';
+        });
+    }
 
     // Keyboard shortcuts
     document.addEventListener('keydown', (e) => {
@@ -1325,6 +1517,12 @@ function updateTrackInfo(track) {
             '<svg class="heart-icon" viewBox="0 0 24 24" width="20" height="20" fill="#666"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>';
         favoriteIcon.innerHTML = heartIcon;  // Update the icon SVG
     }
+
+    // Keep fullscreen modal in sync if open
+    const fsModal = document.getElementById('coverFullscreenModal');
+    if (fsModal && fsModal.classList.contains('active')) {
+        updateCoverFullscreenInfo();
+    }
 }
 
 // ============================================================================
@@ -1836,6 +2034,104 @@ function togglePlaylistCollapse() {
     }
 }
 
+// Open fullscreen cover modal with current track info
+function openCoverFullscreen() {
+    const modal = document.getElementById('coverFullscreenModal');
+    if (!modal) return;
+
+    updateCoverFullscreenInfo();
+    ipcRenderer.send('enter-fullscreen');
+    modal.classList.add('active');
+
+    // Start hide timer for controls
+    const controls = document.getElementById('coverFullscreenControls');
+    if (controls) {
+        controls.classList.remove('hidden');
+        clearTimeout(window._coverHideTimer);
+        window._coverHideTimer = setTimeout(() => {
+            controls.classList.add('hidden');
+        }, 3000);
+    }
+}
+
+// Update the fullscreen modal with current track data
+function updateCoverFullscreenInfo() {
+    if (currentTrackIndex < 0 || !playlist[currentTrackIndex]) return;
+    const track = playlist[currentTrackIndex];
+
+    const titleEl = document.getElementById('coverFullscreenTitle');
+    const artistEl = document.getElementById('coverFullscreenArtist');
+    const albumEl = document.getElementById('coverFullscreenAlbum');
+    const imgEl = document.getElementById('coverFullscreenImg');
+    const placeholder = document.getElementById('coverFullscreenPlaceholder');
+
+    if (titleEl) titleEl.textContent = track.title || track.fileName || '-';
+    if (artistEl) artistEl.textContent = track.artist || 'Artista Desconocido';
+    if (albumEl) albumEl.textContent = track.album || 'Álbum Desconocido';
+
+    // Show cover art if available
+    const coverImgEl = coverArt ? coverArt.querySelector('img') : null;
+    if (imgEl && placeholder) {
+        if (coverImgEl && coverImgEl.src) {
+            imgEl.src = coverImgEl.src;
+            imgEl.style.display = 'block';
+            placeholder.style.display = 'none';
+        } else {
+            imgEl.style.display = 'none';
+            placeholder.style.display = 'flex';
+        }
+    }
+
+    updateCoverFullscreenPlayIcon();
+}
+
+// Update play/pause icon in fullscreen modal
+function updateCoverFullscreenPlayIcon() {
+    const iconEl = document.getElementById('coverFullscreenPlayIcon');
+    if (!iconEl) return;
+    if (isPlaying) {
+        iconEl.querySelector('path').setAttribute('d', 'M6 19h4V5H6v14zm8-14v14h4V5h-4z');
+    } else {
+        iconEl.querySelector('path').setAttribute('d', 'M8 5v14l11-7z');
+    }
+}
+
+// Toggle favorites collapse/expand
+function toggleFavoritesCollapse() {
+    const favListEl = document.getElementById('favoritesList');
+    const collapseBtn = document.getElementById('collapseFavoritesBtn');
+    if (favListEl && collapseBtn) {
+        favListEl.classList.toggle('collapsed');
+        collapseBtn.classList.toggle('collapsed');
+    }
+}
+
+// Show info modal with track information
+function showInfoModal(index) {
+    const track = playlist[index];
+    if (!track) return;
+
+    // Get file stats
+    ipcRenderer.invoke('get-file-stats', track.path).then(stats => {
+        if (stats) {
+            infoTrackName.textContent = track.title || track.fileName || '-';
+            infoBitrate.textContent = stats.bitrate || '-';
+            infoSampleRate.textContent = stats.sampleRate || '-';
+            infoFileSize.textContent = stats.size || '-';
+            infoLocation.textContent = track.path || '-';
+            infoModal.style.display = 'flex';
+        }
+    }).catch(error => {
+        console.error('Error getting file stats:', error);
+        infoTrackName.textContent = track.title || track.fileName || '-';
+        infoBitrate.textContent = '-';
+        infoSampleRate.textContent = '-';
+        infoFileSize.textContent = '-';
+        infoLocation.textContent = track.path || '-';
+        infoModal.style.display = 'flex';
+    });
+}
+
 // Toggle audio recording on/off
 // CRITICAL: DO NOT MODIFY THIS FUNCTION OR ITS LOGIC
 // This function handles the complete recording workflow including:
@@ -2195,11 +2491,28 @@ async function addFolder() {
     const path = require('path');
     const folderName = path.basename(folderPath);
 
-    // Create new collection
-    const newCollection = {
-        name: folderName,
-        playlist: []
-    };
+    // Check if collection already exists
+    const existingCollectionIndex = collections.findIndex(c => c.name === folderName);
+    let newCollection;
+    let existingTracks = new Set();
+
+    if (existingCollectionIndex >= 0) {
+        // Collection exists, use it and track existing files
+        newCollection = collections[existingCollectionIndex];
+        collections[existingCollectionIndex].playlist.forEach(track => {
+            const stat = fs.statSync(track.path);
+            const key = `${track.fileName}_${stat.size}`;
+            existingTracks.add(key);
+        });
+    } else {
+        // Create new collection
+        newCollection = {
+            name: folderName,
+            playlist: []
+        };
+    }
+
+    let newTracksCount = 0;
 
     // Recursive function to walk through directories
     async function walkDir(dir) {
@@ -2210,6 +2523,12 @@ async function addFolder() {
             if (stat.isDirectory()) {
                 await walkDir(filePath);  // Recurse into subdirectory
             } else if (file.match(/\.(mp3|wav|ogg|flac|aac|m4a|wma|opus)$/i)) {
+                // Check for duplicates by name and size
+                const key = `${file}_${stat.size}`;
+                if (existingTracks.has(key)) {
+                    continue;  // Skip duplicate
+                }
+
                 // Get duration for audio file
                 const tempAudio = new Audio(`file://${filePath}`);
                 await new Promise((resolve) => {
@@ -2226,18 +2545,28 @@ async function addFolder() {
                     album: '',
                     duration: duration
                 });
+
+                existingTracks.add(key);
+                newTracksCount++;
             }
         }
     }
 
     await walkDir(folderPath);
 
-    // Add collection to list
-    collections.push(newCollection);
-
-    // Select the new collection
-    currentCollectionIndex = collections.length - 1;
-    playlist = newCollection.playlist;
+    if (existingCollectionIndex >= 0) {
+        // Update existing collection
+        collections[existingCollectionIndex] = newCollection;
+        currentCollectionIndex = existingCollectionIndex;
+        playlist = newCollection.playlist;
+        alert(`Se han agregado ${newTracksCount} canciones nuevas a la colección "${folderName}"`);
+    } else {
+        // Add new collection to list
+        collections.push(newCollection);
+        currentCollectionIndex = collections.length - 1;
+        playlist = newCollection.playlist;
+        alert(`Se han agregado ${newTracksCount} canciones a la nueva colección "${folderName}"`);
+    }
 
     renderCollections();
     renderPlaylist();

@@ -36,23 +36,26 @@ Key Features:
 </head>
 <body>
     <!-- ============================================================================
-         DRAG STRIP - Custom Title Bar
+         TITLE BAR - Custom Title Bar (idéntico al descompresor)
          ============================================================================
-         This thin strip at the top serves as the window title bar for the frameless window.
-         It has -webkit-app-region: drag CSS property to allow window dragging.
-         Contains window title on the left and window controls (minimize, maximize, close) on the right.
+         Barra superior con botones circulares estilo macOS
+         Botones: tema (rosa), minimizar (naranja), maximizar (verde), cerrar (rojo)
     -->
-    <div class="drag-strip">
+    <div class="title-bar">
         <div class="window-title">
             <!-- Music note icon SVG -->
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="#ff6b35" style="vertical-align:middle;margin-right:8px"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="var(--accent)" style="vertical-align:middle;margin-right:8px"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/></svg>
             ARIA - MUSIC
         </div>
-        <div class="window-controls">
-            <!-- Window control buttons - these send IPC messages to main process -->
-            <button class="win-btn win-minimize" id="winMinimize" title="Minimizar">&#x2212;</button>
-            <button class="win-btn win-maximize" id="winMaximize" title="Maximizar">&#x25A1;</button>
-            <button class="win-btn win-close" id="winClose" title="Cerrar">&#x2715;</button>
+        <div class="title-bar-controls">
+            <!-- Theme button -->
+            <button class="title-bar-btn title-bar-theme" id="titleBarTheme" title="Cambiar tema">☀</button>
+            <!-- Minimize button -->
+            <button class="title-bar-btn title-bar-minimize" id="winMinimize" title="Minimizar"></button>
+            <!-- Maximize button -->
+            <button class="title-bar-btn title-bar-maximize" id="winMaximize" title="Maximizar"></button>
+            <!-- Close button -->
+            <button class="title-bar-btn title-bar-close" id="winClose" title="Cerrar"></button>
         </div>
     </div>
 
@@ -66,10 +69,6 @@ Key Features:
     <div class="search-bar-container">
         <input type="text" class="search-input" id="searchInput" placeholder="Buscar por nombre, artista, álbum, colección o tiempo...">
         <div class="search-info" id="searchInfo"></div>
-        <!-- Theme toggle button - switches between dark and light themes -->
-        <button class="theme-btn-top" id="themeBtnTop" title="Cambiar tema">
-            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36-.98 1.37-2.58 2.26-4.4 2.26-3.03 0-5.5-2.47-5.5-5.5 0-1.82.89-3.42 2.26-4.4-.44-.06-.9-.1-1.36-.1z"/></svg>
-        </button>
         <!-- Help button - opens modal with keyboard shortcuts and language selector -->
         <button class="help-btn-top" id="helpBtnTop" title="Ayuda">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
@@ -272,15 +271,18 @@ Key Features:
                  Includes a button to play only favorites (favorites-only mode).
             -->
             <div class="favorites-container">
-                <div class="favorites-header">
+                <div class="favorites-header" id="favoritesHeader" style="cursor: pointer;">
                     <!-- Heart icon for favorites -->
                     <svg viewBox="0 0 24 24" width="14" height="14" fill="#ff6b35" style="flex-shrink:0"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-                    <span id="favoritesHeader">Favoritos</span>
+                    <span id="favoritesHeaderText">Favoritos</span>
                     <span class="favorites-count" id="favoritesCount">0</span>
                     <!-- Play favorites button - enters favorites-only playback mode -->
                     <button id="playFavoritesBtn" title="Reproducir solo favoritos" style="margin-left:auto;background:#ff6b35;border:none;border-radius:5px;color:#fff;padding:3px 8px;cursor:pointer;font-size:11px;display:flex;align-items:center;gap:4px;">
                         <svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor" style="pointer-events:none"><path d="M8 5v14l11-7z"/></svg>
                         <span id="playFavoritesText">Reproducir favoritos</span>
+                    </button>
+                    <button class="collapse-btn" id="collapseFavoritesBtn" title="Colapsar/Expandir Favoritos">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
                     </button>
                 </div>
                 <!-- Favorites list - dynamically populated by JavaScript -->
@@ -348,6 +350,11 @@ Key Features:
         <div class="context-menu-item" id="contextRemove">
             <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
             <span>Eliminar Canción</span>
+        </div>
+        <!-- Info option - shows track information -->
+        <div class="context-menu-item" id="contextInfo">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            <span>Info</span>
         </div>
     </div>
 
@@ -721,6 +728,107 @@ Key Features:
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- ============================================================================
+         INFO MODAL
+         ============================================================================
+         Modal dialog that displays track information.
+         Shows: Name, Bitrate, Hz, Size, Location.
+    -->
+    <div class="modal" id="infoModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Información de la Canción</h2>
+                <button class="modal-close" id="closeInfoModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nombre de la Canción:</label>
+                    <div class="file-info" id="infoTrackName">-</div>
+                </div>
+                <div class="form-group">
+                    <label>Bitrate:</label>
+                    <div class="file-info" id="infoBitrate">-</div>
+                </div>
+                <div class="form-group">
+                    <label>Hz:</label>
+                    <div class="file-info" id="infoSampleRate">-</div>
+                </div>
+                <div class="form-group">
+                    <label>Tamaño:</label>
+                    <div class="file-info" id="infoFileSize">-</div>
+                </div>
+                <div class="form-group">
+                    <label>Ubicación:</label>
+                    <div class="file-info" id="infoLocation">-</div>
+                </div>
+                <div class="form-group">
+                    <button class="action-btn" id="openLocationBtn" style="width: 100%; margin-top: 10px;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="pointer-events:none;vertical-align:middle;margin-right:6px"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+                        Abrir Ubicación
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================================
+         DELETE CONFIRMATION MODAL
+         ============================================================================
+         Modal dialog that confirms track removal from playlist.
+    -->
+    <div class="modal" id="deleteConfirmModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Confirmar Eliminación</h2>
+                <button class="modal-close" id="closeDeleteConfirmModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>¿Estás seguro de que deseas eliminar esta canción de la lista de reproducción?</p>
+                <div class="form-group" style="margin-top: 20px; display: flex; gap: 10px;">
+                    <button class="action-btn" id="confirmDeleteBtn" style="flex: 1; background: #ff5252;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="pointer-events:none;vertical-align:middle;margin-right:6px"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        Eliminar
+                    </button>
+                    <button class="action-btn" id="cancelDeleteBtn" style="flex: 1;">
+                        Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================================
+         FULLSCREEN COVER MODAL
+         ============================================================================
+         Full-screen black modal showing enlarged cover art with track info and controls.
+    -->
+    <div class="cover-fullscreen-modal" id="coverFullscreenModal">
+        <button class="cover-fullscreen-close" id="coverFullscreenClose">&times;</button>
+        <!-- Cover art on the left -->
+        <div id="coverFullscreenImgWrap">
+            <img class="cover-fullscreen-img" id="coverFullscreenImg" src="" alt="cover" style="display:none;">
+            <div class="cover-fullscreen-img-placeholder" id="coverFullscreenPlaceholder">Sin Carátula</div>
+        </div>
+        <!-- Track info on the right -->
+        <div class="cover-fullscreen-info">
+            <div class="cover-fullscreen-title" id="coverFullscreenTitle">-</div>
+            <div class="cover-fullscreen-artist" id="coverFullscreenArtist">-</div>
+            <div class="cover-fullscreen-album" id="coverFullscreenAlbum">-</div>
+        </div>
+        <!-- Playback controls centered at bottom -->
+        <div class="cover-fullscreen-controls" id="coverFullscreenControls">
+            <button class="cover-fullscreen-btn" id="coverFullscreenPrev" title="Anterior">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" style="pointer-events:none"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+            </button>
+            <button class="cover-fullscreen-btn play-btn" id="coverFullscreenPlay" title="Play/Pause">
+                <svg id="coverFullscreenPlayIcon" viewBox="0 0 24 24" width="32" height="32" fill="currentColor" style="pointer-events:none"><path d="M8 5v14l11-7z"/></svg>
+            </button>
+            <button class="cover-fullscreen-btn" id="coverFullscreenNext" title="Siguiente">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="currentColor" style="pointer-events:none"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+            </button>
         </div>
     </div>
 
