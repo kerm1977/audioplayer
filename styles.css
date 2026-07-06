@@ -2,11 +2,11 @@
  * AUDIO PLAYER ELECTRON - STYLESHEET
  * ============================================================================
  * This file contains all CSS styling for the audio player application.
- * 
- * Theme: Dark gradient background with orange accent (#ff6b35)
+ *
+ * Theme: Dark/Light theme with pink accent (#e91e63) - matches ARIA Descompresor
  * Layout: CSS Grid with 2-column layout (collections/playlist left, player right)
  * Typography: Segoe UI, Tahoma, Geneva, Verdana, sans-serif
- * 
+ *
  * Key Styling Sections:
  * - Reset and base styles
  * - Drag strip (custom title bar for frameless window)
@@ -18,6 +18,47 @@
  * - Context menus
  * - Form elements
  * ============================================================================ */
+
+/* ============================================================================
+ * CSS VARIABLES - THEME SYSTEM
+ * ============================================================================
+ * These variables control the color scheme for both dark and light themes.
+ * The theme is switched by adding/removing the data-theme="light" attribute on the HTML element.
+ * ============================================================================ */
+
+:root {
+    /* Dark theme (default) - matches ARIA Descompresor */
+    --bg-dark: #1a1a1a;
+    --bg-darker: #0d0d0d;
+    --bg-card: #252525;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --accent: #e91e63;
+    --accent-hover: #f06292;
+    --success: #00e676;
+    --error: #ff5252;
+    --warning: #ffab40;
+    --border: #333333;
+    --button-bg: #3a3a3a;
+    --button-hover: #4a4a4a;
+}
+
+[data-theme="light"] {
+    /* Light theme - pastel colors */
+    --bg-dark: #f8f4f8;
+    --bg-darker: #f0e8f0;
+    --bg-card: #ffffff;
+    --text-primary: #4a4a4a;
+    --text-secondary: #888888;
+    --accent: #e91e63;
+    --accent-hover: #c2185b;
+    --success: #81c784;
+    --error: #e57373;
+    --warning: #ffb74d;
+    --border: #e0e0e0;
+    --button-bg: #f5f5f5;
+    --button-hover: #eeeeee;
+}
 
 /* ============================================================================
  * RESET AND BASE STYLES
@@ -37,18 +78,18 @@ html {
     background: transparent;
 }
 
-/* Body styling - dark gradient background with rounded corners */
+/* Body styling - uses CSS variables for theme support */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
-    color: #e0e0e0;
+    background: var(--bg-dark);
+    color: var(--text-primary);
     overflow: hidden;
     height: 100vh;
     display: flex;
     flex-direction: column;
     border-radius: 14px;
-    border: 1px solid #444;
-    box-shadow: 0 0 0 1px #222 inset;
+    border: 1px solid var(--border);
+    box-shadow: 0 0 0 1px var(--bg-darker) inset;
 }
 
 /* ============================================================================
@@ -62,7 +103,7 @@ body {
 /* Thin drag strip at the very top - also hosts window control buttons */
 .drag-strip {
     height: 28px;
-    background: #1a1a1a;
+    background: var(--bg-darker);
     -webkit-app-region: drag;  /* Allows window to be dragged by this area */
     flex-shrink: 0;
     border-radius: 14px 14px 0 0;
@@ -86,9 +127,9 @@ body {
 
 /* Search bar container - drag region for frameless window */
 .search-bar-container {
-    background: #252525;
+    background: var(--bg-card);
     padding: 10px 20px;
-    border-bottom: 1px solid #3a3a3a;
+    border-bottom: 1px solid var(--border);
     display: flex;
     align-items: center;
     gap: 15px;
@@ -115,7 +156,7 @@ body {
     flex: 1;
     font-size: 12px;
     font-weight: 600;
-    color: #e0e0e0;
+    color: var(--text-primary);
     text-align: center;
     letter-spacing: 1px;
     user-select: none;
@@ -166,35 +207,35 @@ body {
 .search-input {
     flex: 1;
     max-width: 420px;
-    background: #2e2e2e;
-    border: 1px solid #3a3a3a;
+    background: var(--bg-darker);
+    border: 1px solid var(--border);
     border-radius: 20px;
     padding: 8px 12px;
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-size: 14px;
     outline: none;
     transition: border-color 0.3s;
 }
 
 .search-input:focus {
-    border-color: #ff6b35;
+    border-color: var(--accent);
 }
 
 .search-input::placeholder {
-    color: #888;
+    color: var(--text-secondary);
 }
 
 /* Search info - shows number of results */
 .search-info {
-    color: #888;
+    color: var(--text-secondary);
     font-size: 12px;
     white-space: nowrap;
 }
 
 /* Help button in top bar */
 .help-btn-top {
-    background: #3a3a3a;
-    border: 1px solid #4a4a4a;
+    background: var(--button-bg);
+    border: 1px solid var(--border);
     border-radius: 50%;
     width: 32px;
     height: 32px;
@@ -205,14 +246,38 @@ body {
     font-size: 16px;
     transition: background 0.3s, border-color 0.3s;
     flex-shrink: 0;
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-weight: bold;
 }
 
 .help-btn-top:hover {
-    background: #4a4a4a;
-    border-color: #ff6b35;
-    color: #ff6b35;
+    background: var(--button-hover);
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Theme toggle button - switches between dark and light themes */
+.theme-btn-top {
+    background: var(--button-bg);
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s, border-color 0.3s;
+    flex-shrink: 0;
+    color: var(--text-primary);
+    font-weight: bold;
+}
+
+.theme-btn-top:hover {
+    background: var(--button-hover);
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 /* ============================================================================
@@ -278,29 +343,29 @@ body {
     gap: 20px;
     align-items: center;
     padding: 15px;
-    background: #252525;
+    background: var(--bg-card);
     border-radius: 8px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--button-bg);
 }
 
 /* Album art display - shows embedded artwork or placeholder */
 .cover-art {
     width: 120px;
     height: 120px;
-    background: #1a1a1a;
+    background: var(--bg-darker);
     border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    border: 2px solid #3a3a3a;
+    border: 2px solid var(--button-bg);
     cursor: pointer;  /* Clickable to change cover art */
     position: relative;
     transition: border-color 0.2s;
 }
 
 .cover-art:hover {
-    border-color: #ff6b35;  /* Orange highlight on hover */
+    border-color: var(--accent);  /* Orange highlight on hover */
 }
 
 /* Overlay text shown on hover - prompts user to change cover art */
@@ -331,7 +396,7 @@ body {
 
 /* Placeholder text when no cover art is available */
 .no-cover {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 12px;
     text-align: center;
 }
@@ -348,19 +413,19 @@ body {
 .track-title {
     font-size: 20px;
     font-weight: bold;
-    color: #ff6b35;  /* Primary orange accent */
+    color: var(--accent);  /* Primary orange accent */
 }
 
 /* Artist name - secondary text color */
 .track-artist {
     font-size: 16px;
-    color: #b0b0b0;
+    color: var(--text-secondary);
 }
 
 /* Album name - tertiary text color */
 .track-album {
     font-size: 14px;
-    color: #888;
+    color: var(--text-secondary);
 }
 
 /* Favorite toggle - heart icon for favoriting tracks */
@@ -393,10 +458,10 @@ body {
 
 .visualizer {
     height: 100px;
-    background: #1a1a1a;
+    background: var(--bg-darker);
     border-radius: 8px;
     overflow: hidden;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--button-bg);
 }
 
 /* Canvas element for drawing spectrum bars */
@@ -424,7 +489,7 @@ body {
     width: 100%;
     height: 6px;
     border-radius: 3px;
-    background: #3a3a3a;
+    background: var(--button-bg);
     outline: none;
 }
 
@@ -435,13 +500,13 @@ body {
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: #ff6b35;  /* Orange accent */
+    background: var(--accent);  /* Orange accent */
     cursor: pointer;
     transition: background 0.2s;
 }
 
 .seek-slider::-webkit-slider-thumb:hover {
-    background: #ff8555;  /* Lighter orange on hover */
+    background: var(--accent-hover);  /* Lighter orange on hover */
 }
 
 /* Time display (current time / total time) */
@@ -450,11 +515,11 @@ body {
     justify-content: center;
     gap: 10px;
     font-size: 14px;
-    color: #b0b0b0;
+    color: var(--text-secondary);
 }
 
 .separator {
-    color: #666;
+    color: var(--text-secondary);
 }
 
 /* ============================================================================
@@ -466,9 +531,9 @@ body {
     justify-content: center;
     gap: 15px;
     padding: 10px;
-    background: #252525;
+    background: var(--bg-card);
     border-radius: 8px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--button-bg);
 }
 
 /* ============================================================================
@@ -485,9 +550,9 @@ body {
     justify-content: center;
     align-items: center;
     padding: 10px;
-    background: #252525;
+    background: var(--bg-card);
     border-radius: 8px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--button-bg);
 }
 
 /* Control button base styling */
@@ -496,8 +561,8 @@ body {
     height: 45px;
     border: none;
     border-radius: 8px;
-    background: #3a3a3a;
-    color: #e0e0e0;
+    background: var(--button-bg);
+    color: var(--text-primary);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -506,7 +571,7 @@ body {
 }
 
 .control-btn:hover {
-    background: #4a4a4a;
+    background: var(--button-hover);
     transform: scale(1.05);  /* Slight scale up on hover */
 }
 
@@ -514,28 +579,28 @@ body {
 .control-btn:disabled {
     opacity: 0.3;
     cursor: not-allowed;
-    background: #2a2a2a;
+    background: var(--bg-darker);
 }
 
 .control-btn:disabled:hover {
     transform: none;
-    background: #2a2a2a;
+    background: var(--bg-darker);
 }
 
 /* Active state for shuffle/repeat buttons - orange highlight */
 .control-btn.active {
-    color: #ff6b35;
-    background: #2a2a2a;
+    color: var(--accent);
+    background: var(--bg-darker);
 }
 
 .control-btn.active svg {
-    fill: #ff6b35;  /* Orange fill for active state */
+    fill: var(--accent);  /* Orange fill for active state */
 }
 
 /* Recording state - red highlight with pulsing animation */
 .control-btn.recording {
     color: #ff0000;
-    background: #2a2a2a;
+    background: var(--bg-darker);
     animation: pulse 1.5s infinite;
 }
 
@@ -564,11 +629,11 @@ body {
 .play-btn {
     width: 55px;
     height: 55px;
-    background: #ff6b35;  /* Orange accent */
+    background: var(--accent);  /* Orange accent */
 }
 
 .play-btn:hover {
-    background: #ff8555;  /* Lighter orange on hover */
+    background: var(--accent-hover);  /* Lighter orange on hover */
 }
 
 /* ============================================================================
@@ -584,13 +649,13 @@ body {
     align-items: center;
     gap: 10px;
     padding: 10px 15px;
-    background: #252525;
+    background: var(--bg-card);
     border-radius: 8px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--button-bg);
 }
 
 .volume-icon {
-    fill: #b0b0b0;
+    fill: var(--text-secondary);
 }
 
 /* Volume slider - blue accent color (different from orange) */
@@ -599,7 +664,7 @@ body {
     flex: 1;
     height: 4px;
     border-radius: 2px;
-    background: #3a3a3a;
+    background: var(--button-bg);
     outline: none;
 }
 
@@ -635,8 +700,8 @@ body {
     padding: 10px 16px;
     border: none;
     border-radius: 6px;
-    background: #3a3a3a;
-    color: #e0e0e0;
+    background: var(--button-bg);
+    color: var(--text-primary);
     font-size: 13px;
     cursor: pointer;
     transition: all 0.2s;
@@ -650,9 +715,9 @@ body {
     font-size: 10px;
     padding: 2px 5px;
     border-radius: 3px;
-    background: #252525;
-    border: 1px solid #555;
-    color: #aaa;
+    background: var(--bg-card);
+    border: 1px solid var(--text-secondary);
+    color: var(--text-secondary);
     font-family: inherit;
 }
 
@@ -671,15 +736,15 @@ body {
     width: 90px;
     height: 90px;
     border-radius: 6px;
-    background: #1a1a1a;
-    border: 2px solid #3a3a3a;
+    background: var(--bg-darker);
+    border: 2px solid var(--button-bg);
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     flex-shrink: 0;
     font-size: 11px;
-    color: #555;
+    color: var(--text-secondary);
     text-align: center;
 }
 
@@ -707,7 +772,7 @@ body {
     align-items: center;
     gap: 8px;
     font-size: 13px;
-    color: #aaa;
+    color: var(--text-secondary);
     cursor: pointer;
     margin-top: 4px;
 }
@@ -733,14 +798,14 @@ body {
 }
 
 .metadata-collection-cover input[type="checkbox"] {
-    accent-color: #ff6b35;
+    accent-color: var(--accent);
     width: 15px;
     height: 15px;
     cursor: pointer;
 }
 
 .action-btn:hover {
-    background: #4a4a4a;
+    background: var(--button-hover);
 }
 
 .action-btn:active {
@@ -752,8 +817,8 @@ body {
     padding: 8px 12px;
     border: none;
     border-radius: 6px;
-    background: #3a3a3a;
-    color: #e0e0e0;
+    background: var(--button-bg);
+    color: var(--text-primary);
     font-size: 14px;
     cursor: pointer;
     transition: all 0.2s;
@@ -761,12 +826,12 @@ body {
 }
 
 .language-selector:hover {
-    background: #4a4a4a;
+    background: var(--button-hover);
 }
 
 .language-selector option {
-    background: #2d2d2d;
-    color: #e0e0e0;
+    background: var(--bg-darker);
+    color: var(--text-primary);
 }
 
 /* Language container with help button */
@@ -775,9 +840,9 @@ body {
     align-items: center;
     gap: 8px;
     padding: 10px 15px;
-    background: #252525;
+    background: var(--bg-card);
     border-radius: 8px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--button-bg);
 }
 
 .language-container label {
@@ -795,9 +860,9 @@ body {
 .playlist-container {
     display: flex;
     flex-direction: column;
-    background: #252525;
+    background: var(--bg-card);
     border-radius: 8px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--button-bg);
     overflow: hidden;
     max-height: 100%;
 }
@@ -805,9 +870,9 @@ body {
 /* Playlist header text - shows collection/playlist name and count */
 .playlist-header {
     padding: 12px 15px;
-    background: #2d2d2d;
+    background: var(--bg-darker);
     font-weight: bold;
-    border-bottom: 1px solid #3a3a3a;
+    border-bottom: 1px solid var(--button-bg);
     flex-shrink: 0;
     display: flex;
     justify-content: space-between;
@@ -826,7 +891,7 @@ body {
 .collapse-btn {
     background: none;
     border: none;
-    color: #888;
+    color: var(--text-secondary);
     cursor: pointer;
     padding: 4px;
     border-radius: 4px;
@@ -838,7 +903,7 @@ body {
 }
 
 .collapse-btn:hover {
-    background: #3a3a3a;
+    background: var(--button-bg);
     color: #fff;
 }
 
@@ -852,7 +917,7 @@ body {
 
 /* Count badges - orange badges showing number of items */
 .playlist-count, .favorites-count {
-    background: #ff6b35;
+    background: var(--accent);
     color: #fff;
     font-size: 11px;
     padding: 2px 8px;
@@ -901,16 +966,16 @@ body {
 }
 
 .collections::-webkit-scrollbar-track {
-    background: #1a1a1a;
+    background: var(--bg-darker);
 }
 
 .collections::-webkit-scrollbar-thumb {
-    background: #3a3a3a;
+    background: var(--button-bg);
     border-radius: 4px;
 }
 
 .collections::-webkit-scrollbar-thumb:hover {
-    background: #4a4a4a;
+    background: var(--button-hover);
 }
 
 /* Collection item */
@@ -926,12 +991,12 @@ body {
 }
 
 .collection-item:hover {
-    background: #3a3a3a;
+    background: var(--button-bg);
 }
 
 /* Currently selected collection - orange highlight */
 .collection-item.active {
-    background: #ff6b35;
+    background: var(--accent);
     color: white;
 }
 
@@ -946,7 +1011,7 @@ body {
 }
 
 .collection-item-count {
-    color: #888;
+    color: var(--text-secondary);
     font-size: 12px;
 }
 
@@ -964,16 +1029,16 @@ body {
 }
 
 .playlist::-webkit-scrollbar-track {
-    background: #1a1a1a;
+    background: var(--bg-darker);
 }
 
 .playlist::-webkit-scrollbar-thumb {
-    background: #3a3a3a;
+    background: var(--button-bg);
     border-radius: 4px;
 }
 
 .playlist::-webkit-scrollbar-thumb:hover {
-    background: #4a4a4a;
+    background: var(--button-hover);
 }
 
 /* Individual playlist item */
@@ -989,7 +1054,7 @@ body {
 }
 
 .playlist-item:hover {
-    background: #3a3a3a;
+    background: var(--button-bg);
 }
 
 /* Currently playing track - orange highlight */
@@ -1009,17 +1074,17 @@ body {
 
 /* Alternating row colors for better readability */
 .playlist-item:nth-child(even) {
-    background: #2a2a2a;
+    background: var(--bg-darker);
 }
 
 /* Search result styling */
 .playlist-item.search-result {
-    background: #2a2a2a;
+    background: var(--bg-darker);
 }
 
 .playlist-item-collection {
     font-size: 11px;
-    color: #888;
+    color: var(--text-secondary);
     max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1027,13 +1092,13 @@ body {
 }
 
 .playlist-item:nth-child(even):hover {
-    background: #3a3a3a;
+    background: var(--button-bg);
 }
 
 /* Track number in playlist */
 .playlist-item-number {
     font-size: 11px;
-    color: #555;
+    color: var(--text-secondary);
     min-width: 20px;
     text-align: right;
     flex-shrink: 0;
@@ -1088,7 +1153,7 @@ body {
 
 /* Track duration text */
 .playlist-item-duration {
-    color: #888;
+    color: var(--text-secondary);
     font-size: 13px;
     flex-shrink: 0;
 }
@@ -1097,7 +1162,7 @@ body {
 .empty-playlist {
     text-align: center;
     padding: 40px;
-    color: #666;
+    color: var(--text-secondary);
 }
 
 /* ============================================================================
@@ -1113,16 +1178,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-    background: #1a1a1a;
+    background: var(--bg-darker);
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #3a3a3a;
+    background: var(--button-bg);
     border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #4a4a4a;
+    background: var(--button-hover);
 }
 
 /* ============================================================================
@@ -1134,8 +1199,8 @@ body {
 
 .context-menu {
     position: fixed;
-    background: #2d2d2d;
-    border: 1px solid #3a3a3a;
+    background: var(--bg-darker);
+    border: 1px solid var(--button-bg);
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     z-index: 1000;
@@ -1151,20 +1216,20 @@ body {
     padding: 10px 15px;
     cursor: pointer;
     transition: background 0.2s;
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-size: 14px;
 }
 
 /* Context menu item hover - orange highlight */
 .context-menu-item:hover {
-    background: #ff6b35;  /* Orange accent on hover */
+    background: var(--accent);  /* Orange accent on hover */
     color: white;
 }
 
 /* Separator line in context menu */
 .context-menu-separator {
     height: 1px;
-    background: #3a3a3a;
+    background: var(--button-bg);
     margin: 5px 0;
 }
 
@@ -1190,9 +1255,9 @@ body {
 
 /* Modal content box - main container for modal content */
 .modal-content {
-    background: #252525;
+    background: var(--bg-card);
     border-radius: 12px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--button-bg);
     width: 90%;
     max-width: 500px;
     max-height: 90vh;
@@ -1210,7 +1275,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    border-bottom: 1px solid #3a3a3a;
+    border-bottom: 1px solid var(--button-bg);
     position: relative;
     z-index: 5;
 }
@@ -1218,14 +1283,14 @@ body {
 .modal-header h2 {
     margin: 0;
     font-size: 20px;
-    color: #ff6b35;  /* Orange accent for modal titles */
+    color: var(--accent);  /* Orange accent for modal titles */
 }
 
 /* Close button (X) - top right of modal */
 .modal-close {
     background: none;
     border: none;
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-size: 28px;
     cursor: pointer;
     padding: 0;
@@ -1241,7 +1306,7 @@ body {
 }
 
 .modal-close:hover {
-    background: #3a3a3a;
+    background: var(--button-bg);
 }
 
 /* ============================================================================
@@ -1252,9 +1317,9 @@ body {
  */
 
 .favorites-container {
-    background: #252525;
+    background: var(--bg-card);
     border-radius: 8px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--button-bg);
     overflow: hidden;
     display: flex;
     flex-direction: column;
@@ -1267,11 +1332,11 @@ body {
     align-items: center;
     gap: 8px;
     padding: 8px 12px;
-    background: #1a1a1a;
-    border-bottom: 1px solid #3a3a3a;
+    background: var(--bg-darker);
+    border-bottom: 1px solid var(--button-bg);
     font-size: 13px;
     font-weight: bold;
-    color: #ff6b35;
+    color: var(--accent);
 }
 
 .favorites-list {
@@ -1285,13 +1350,13 @@ body {
     gap: 8px;
     padding: 6px 12px;
     cursor: pointer;
-    border-bottom: 1px solid #2a2a2a;
+    border-bottom: 1px solid var(--bg-darker);
     transition: background 0.15s;
     font-size: 13px;
 }
 
 .favorite-item:hover {
-    background: #2d2d2d;
+    background: var(--bg-darker);
 }
 
 .favorite-item:last-child {
@@ -1299,20 +1364,20 @@ body {
 }
 
 .favorite-item.playing {
-    background: #2a1a0a;
-    color: #ff6b35;
+    background: var(--bg-darker);
+    color: var(--accent);
 }
 
 .favorite-item-number {
     font-size: 11px;
-    color: #555;
+    color: var(--text-secondary);
     min-width: 18px;
     text-align: right;
     flex-shrink: 0;
 }
 
 .favorite-item.playing .favorite-item-number {
-    color: #ff6b35;
+    color: var(--accent);
 }
 
 .favorite-item-title {
@@ -1320,19 +1385,19 @@ body {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #e0e0e0;
+    color: var(--text-primary);
 }
 
 .favorite-item-collection {
     font-size: 11px;
-    color: #666;
+    color: var(--text-secondary);
     flex-shrink: 0;
 }
 
 .empty-favorites {
     padding: 12px;
     text-align: center;
-    color: #555;
+    color: var(--text-secondary);
     font-size: 12px;
 }
 
@@ -1355,20 +1420,20 @@ body {
 
 .help-info h3 {
     margin: 0 0 10px 0;
-    color: #ff6b35;
+    color: var(--accent);
     font-size: 18px;
 }
 
 .help-info p {
     margin: 10px 0;
-    color: #e0e0e0;
+    color: var(--text-primary);
     line-height: 1.5;
 }
 
 .help-info ul {
     margin: 10px 0;
     padding-left: 20px;
-    color: #e0e0e0;
+    color: var(--text-primary);
 }
 
 .help-info li {
@@ -1380,7 +1445,7 @@ body {
 }
 
 .help-info .learn-more a {
-    color: #ff6b35;
+    color: var(--accent);
     text-decoration: none;
     font-weight: bold;
 }
@@ -1395,7 +1460,7 @@ body {
     justify-content: flex-end;
     gap: 10px;
     padding: 20px;
-    border-top: 1px solid #3a3a3a;
+    border-top: 1px solid var(--button-bg);
 }
 
 /* Form group container - wraps label and input/select */
@@ -1406,16 +1471,16 @@ body {
 .form-group label {
     display: block;
     margin-bottom: 5px;
-    color: #b0b0b0;
+    color: var(--text-secondary);
     font-size: 14px;
 }
 
 /* File info display box - shows file path or format information */
 .file-info {
-    background: #1a1a1a;
+    background: var(--bg-darker);
     padding: 10px;
     border-radius: 6px;
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-size: 14px;
 }
 
@@ -1424,10 +1489,10 @@ body {
 .form-input {
     width: 100%;
     padding: 10px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--button-bg);
     border-radius: 6px;
-    background: #1a1a1a;
-    color: #e0e0e0;
+    background: var(--bg-darker);
+    color: var(--text-primary);
     font-size: 14px;
     outline: none;
 }
@@ -1435,12 +1500,12 @@ body {
 /* Focus state - orange border for visual feedback */
 .form-select:focus,
 .form-input:focus {
-    border-color: #ff6b35;  /* Orange accent on focus */
+    border-color: var(--accent);  /* Orange accent on focus */
 }
 
 .form-select option {
-    background: #2d2d2d;
-    color: #e0e0e0;
+    background: var(--bg-darker);
+    color: var(--text-primary);
 }
 
 /* Path selector with browse button - for file/folder selection */
@@ -1456,16 +1521,38 @@ body {
 /* Browse button for file selection - opens file dialog */
 .browse-btn {
     padding: 10px 15px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--button-bg);
     border-radius: 6px;
-    background: #3a3a3a;
-    color: #e0e0e0;
+    background: var(--button-bg);
+    color: var(--text-primary);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .browse-btn:hover {
-    background: #4a4a4a;
+    background: var(--button-hover);
+}
+
+/* Remove cover buttons - red/pink accent for destructive actions */
+.remove-cover-btn {
+    background: #3a1a1a;
+    border-color: #7a2a2a;
+}
+
+.remove-cover-btn:hover {
+    background: #4a2a2a;
+    border-color: #8a3a3a;
+}
+
+[data-theme="light"] .remove-cover-btn {
+    background: #fce4e4;
+    border-color: #f8b4b4;
+    color: #8a2a2a;
+}
+
+[data-theme="light"] .remove-cover-btn:hover {
+    background: #f8d4d4;
+    border-color: #f6a4a4;
 }
 
 /* ============================================================================
@@ -1487,22 +1574,22 @@ body {
 
 /* Primary action button - orange (save, confirm, convert) */
 .modal-btn.primary {
-    background: #ff6b35;
+    background: var(--accent);
     color: white;
 }
 
 .modal-btn.primary:hover {
-    background: #ff8555;  /* Lighter orange on hover */
+    background: var(--accent-hover);  /* Lighter orange on hover */
 }
 
 /* Secondary action button - gray (cancel, close) */
 .modal-btn.secondary {
-    background: #3a3a3a;
-    color: #e0e0e0;
+    background: var(--button-bg);
+    color: var(--text-primary);
 }
 
 .modal-btn.secondary:hover {
-    background: #4a4a4a;
+    background: var(--button-hover);
 }
 
 /* ============================================================================
@@ -1524,27 +1611,27 @@ body {
     align-items: center;
     justify-content: center;
     padding: 20px 10px;
-    background: #2d2d2d;
-    border: 1px solid #3a3a3a;
+    background: var(--bg-darker);
+    border: 1px solid var(--button-bg);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .share-option:hover {
-    background: #3a3a3a;
-    border-color: #ff6b35;
+    background: var(--button-bg);
+    border-color: var(--accent);
     transform: translateY(-2px);
 }
 
 .share-option svg {
     margin-bottom: 10px;
-    color: #ff6b35;
+    color: var(--accent);
 }
 
 .share-option span {
     font-size: 14px;
-    color: #e0e0e0;
+    color: var(--text-primary);
     text-align: center;
 }
 
@@ -1563,7 +1650,7 @@ body {
 .progress-bar {
     width: 100%;
     height: 20px;
-    background: #1a1a1a;
+    background: var(--bg-darker);
     border-radius: 10px;
     overflow: hidden;
     margin-bottom: 10px;
@@ -1572,14 +1659,14 @@ body {
 /* Progress fill - orange gradient fill that animates */
 .progress-fill {
     height: 100%;
-    background: linear-gradient(90deg, #ff6b35, #ff8555);  /* Orange gradient */
+    background: linear-gradient(90deg, var(--accent), var(--accent-hover));  /* Orange gradient */
     width: 0%;
     transition: width 0.3s;
 }
 
 /* Progress percentage text - shows completion percentage */
 .progress-text {
-    color: #e0e0e0;
+    color: var(--text-primary);
     font-size: 16px;
     font-weight: bold;
 }
@@ -1592,9 +1679,9 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    border: 1px solid #3a3a3a;
-    background: #3a3a3a;
-    color: #e0e0e0;
+    border: 1px solid var(--button-bg);
+    background: var(--button-bg);
+    color: var(--text-primary);
     font-size: 20px;
     cursor: pointer;
     transition: all 0.2s;
@@ -1604,30 +1691,30 @@ body {
 }
 
 .help-btn:hover {
-    background: #4a4a4a;
-    border-color: #ff6b35;  /* Orange border on hover */
+    background: var(--button-hover);
+    border-color: var(--accent);  /* Orange border on hover */
 }
 
 /* Help info section in modal */
 .help-info {
-    background: #1a1a1a;
+    background: var(--bg-darker);
     padding: 15px;
     border-radius: 8px;
     margin-top: 15px;
 }
 
 .help-info h3 {
-    color: #ff6b35;  /* Orange accent for section title */
+    color: var(--accent);  /* Orange accent for section title */
     margin-bottom: 10px;
 }
 
 .help-info p {
-    color: #b0b0b0;
+    color: var(--text-secondary);
     margin-bottom: 10px;
 }
 
 .help-info ul {
-    color: #b0b0b0;
+    color: var(--text-secondary);
     padding-left: 20px;
 }
 
@@ -1659,9 +1746,9 @@ body {
     flex: 1;
     min-width: 58px;
     padding: 6px 8px;
-    border: 1px solid #3a3a3a;
+    border: 1px solid var(--button-bg);
     border-radius: 16px;
-    background: #2d2d2d;
+    background: var(--bg-darker);
     color: #bbb;
     font-size: 12px;
     cursor: pointer;
@@ -1669,13 +1756,13 @@ body {
 }
 
 .eq-preset-btn:hover {
-    background: #3a3a3a;
-    color: #e0e0e0;
+    background: var(--button-bg);
+    color: var(--text-primary);
 }
 
 .eq-preset-btn.active {
-    background: #ff6b35;  /* Orange accent for active preset */
-    border-color: #ff6b35;
+    background: var(--accent);  /* Orange accent for active preset */
+    border-color: var(--accent);
     color: #fff;
 }
 
@@ -1699,7 +1786,7 @@ body {
 /* EQ band value display - shows current gain value in dB */
 .eq-band-value {
     font-size: 11px;
-    color: #ff6b35;
+    color: var(--accent);
     font-weight: bold;
     min-width: 28px;
     text-align: center;
@@ -1711,13 +1798,13 @@ body {
     width: 28px;
     height: 120px;
     cursor: pointer;
-    accent-color: #ff6b35;  /* Orange accent for slider thumb */
+    accent-color: var(--accent);  /* Orange accent for slider thumb */
 }
 
 /* EQ band label - shows frequency (60Hz, 250Hz, etc.) */
 .eq-band-label {
     font-size: 10px;
-    color: #888;
+    color: var(--text-secondary);
 }
 
 /* ============================================================================

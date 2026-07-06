@@ -108,6 +108,9 @@ let shareModal, shareTrackName, closeShareModal;
 // Help modal elements
 let helpModal, closeHelpModal, helpBtn, helpBtnTop;
 
+// Theme toggle button
+let themeBtnTop;
+
 // Search elements
 let searchInput, searchInfo;
 
@@ -230,11 +233,23 @@ function initDOMElements() {
     // Add click listener to collections header to toggle collapse
     if (collectionsHeader) {
         collectionsHeader.addEventListener('click', toggleCollectionsCollapse);
+        // Add wheel listener to toggle collapse with scroll
+        collectionsHeader.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleCollectionsCollapse();
+        }, { passive: false });
     }
 
     // Add click listener to playlist header to toggle collapse
     if (playlistHeader) {
         playlistHeader.addEventListener('click', togglePlaylistCollapse);
+        // Add wheel listener to toggle collapse with scroll
+        playlistHeader.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            togglePlaylistCollapse();
+        }, { passive: false });
     }
 
     // Language selector dropdown for UI translation
@@ -264,6 +279,9 @@ function initDOMElements() {
     helpModal = document.getElementById('helpModal');
     closeHelpModal = document.getElementById('closeHelpModal');
     helpBtnTop = document.getElementById('helpBtnTop');
+
+    // Theme toggle button - switches between dark and light themes
+    themeBtnTop = document.getElementById('themeBtnTop');
 
     // Search bar elements - for filtering tracks
     searchInput = document.getElementById('searchInput');
@@ -489,6 +507,11 @@ function initEventListeners() {
     helpBtnTop.addEventListener('click', () => {
         helpModal.style.display = 'flex';
     });
+
+    // Theme toggle button - switches between dark and light themes
+    if (themeBtnTop) {
+        themeBtnTop.addEventListener('click', toggleTheme);
+    }
 
     // Close help modal when clicking outside the content
     helpModal.addEventListener('click', (e) => {
@@ -2786,7 +2809,8 @@ async function saveState() {
         currentTime: audioElement1 ? audioElement1.currentTime : 0,
         volume: volumeSlider ? parseInt(volumeSlider.value) : 100,
         eqPreset: currentEQPreset,
-        eqGains: eqBands.map(b => b.gain.value)
+        eqGains: eqBands.map(b => b.gain.value),
+        theme: currentTheme  // Save current theme preference
     };
     await ipcRenderer.invoke('save-state', state);
 }
@@ -2874,15 +2898,47 @@ async function loadState() {
         if (state.eqPreset) {
             currentEQPreset = state.eqPreset;
             document.querySelectorAll('.eq-preset-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.preset === state.eqPreset);
+                btn.classList.remove('active');
+                if (btn.textContent === state.eqPreset) btn.classList.add('active');
             });
         }
+    }
+
+    // Restore theme
+    if (state.theme) {
+        applyTheme(state.theme);
     }
 }
 
 // isMuted and lastVolume declared at module level, handler attached in initEventListeners
 let isMuted = false;
 let lastVolume = 100;
+
+// ============================================================================
+// THEME SYSTEM
+// ============================================================================
+// The theme system allows users to switch between dark and light themes.
+// Theme preference is saved to localStorage and restored on application startup.
+// Themes use CSS variables defined in styles.css for consistent styling.
+
+let currentTheme = 'dark';  // Current theme: 'dark' or 'light'
+
+// Toggle between dark and light themes
+function toggleTheme() {
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    applyTheme(newTheme);
+    saveState();  // Save theme preference to localStorage
+}
+
+// Apply a specific theme to the application
+function applyTheme(theme) {
+    currentTheme = theme;
+    if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
+}
 
 // ============================================================================
 // INITIALIZATION
