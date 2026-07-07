@@ -256,6 +256,8 @@ npm run build
 
 Este proyecto es **Código Abierto** y está disponible para toda la comunidad.
 
+**Licencia: Código Abierto para toda la comunidad Linux**
+
 ---
 
 ## 🤝 Contribuciones
