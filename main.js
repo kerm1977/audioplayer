@@ -232,7 +232,7 @@ let isManuallyMaximized = false; // Track if window is in custom maximized state
 // Implements custom maximize that saves bounds and restores them
 ipcMain.on('window-maximize', () => {
     if (!mainWindow) return;  // Safety check
-    
+
     // If already maximized (manually or natively), restore to saved bounds
     if (isManuallyMaximized || mainWindow.isMaximized()) {
         isManuallyMaximized = false;  // Reset custom maximize flag

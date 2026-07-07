@@ -102,12 +102,12 @@ Key Features:
             </div>
             <!-- Collections list - dynamically populated by JavaScript -->
             <div class="collections" id="collections">
-                <div class="empty-playlist">No hay colecciones</div>
+                <div class="empty-playlist" data-i18n="emptyCollections">No hay colecciones</div>
             </div>
             <!-- Playlist header -->
             <div class="playlist-header" id="playlistHeader" style="margin-top: 10px; cursor: pointer;">
                 <div class="playlist-header-title-group">
-                    <span id="playlistHeaderText">Lista de Reproducción</span>
+                    <span id="playlistHeaderText" data-i18n="playlistHeader">Lista de Reproducción</span>
                 </div>
                 <button class="collapse-btn" id="collapsePlaylistBtn" title="Colapsar/Expandir Lista de Reproducción">
                     <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/></svg>
@@ -115,7 +115,7 @@ Key Features:
             </div>
             <!-- Playlist - dynamically populated by JavaScript based on selected collection -->
             <div class="playlist" id="playlist">
-                <div class="empty-playlist">Selecciona una colección</div>
+                <div class="empty-playlist" data-i18n="selectCollection">Selecciona una colección</div>
             </div>
         </div>
 
@@ -287,7 +287,7 @@ Key Features:
                 </div>
                 <!-- Favorites list - dynamically populated by JavaScript -->
                 <div class="favorites-list" id="favoritesList">
-                    <div class="empty-favorites">No hay favoritos</div>
+                    <div class="empty-favorites" data-i18n="noFavorites">No hay favoritos</div>
                 </div>
             </div>
         </div>
@@ -366,8 +366,29 @@ Key Features:
          Hidden by default, shown via JavaScript on right-click event.
     -->
     <div class="context-menu" id="collectionContextMenu" style="display: none;">
-        <div class="context-menu-item" id="collectionContextEdit">Editar Nombre</div>
-        <div class="context-menu-item" id="collectionContextDelete">Eliminar Colección</div>
+        <div class="context-menu-item" id="collectionContextEdit" data-i18n="collectionContextEdit">Editar Nombre</div>
+        <div class="context-menu-item" id="collectionContextDelete" data-i18n="deleteCollection">Eliminar Colección</div>
+    </div>
+
+    <!-- ============================================================================
+         HEADER CONTEXT MENU
+         ============================================================================
+         Context menu for collection/playlist/favorites headers.
+         Options: Mantener Expandido, Colapsar Automáticamente.
+    -->
+    <div class="context-menu" id="headerContextMenu" style="display: none;">
+        <div class="context-menu-item" id="headerContextKeepExpanded" data-i18n="headerContextKeepExpanded">Mantener Expandido</div>
+        <div class="context-menu-item" id="headerContextAutoCollapse" data-i18n="headerContextAutoCollapse">Colapsar Automáticamente</div>
+    </div>
+
+    <!-- ============================================================================
+         FAVORITES CONTEXT MENU
+         ============================================================================
+         Context menu for favorite tracks.
+         Options: Eliminar de Favoritos.
+    -->
+    <div class="context-menu" id="favoritesContextMenu" style="display: none;">
+        <div class="context-menu-item" id="favoritesContextRemove" data-i18n="favoritesContextRemove">Eliminar de Favoritos</div>
     </div>
 
     <!-- ============================================================================
@@ -378,21 +399,21 @@ Key Features:
     <div class="modal" id="editCollectionModal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Editar Nombre de Colección</h2>
+                <h2 data-i18n="editCollectionTitle">Editar Nombre de Colección</h2>
                 <button class="modal-close" id="closeEditCollectionModal">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Nombre actual:</label>
+                    <label data-i18n="currentNameLabel">Nombre actual:</label>
                     <div class="file-info" id="editCollectionCurrentName">-</div>
                 </div>
                 <div class="form-group">
-                    <label for="editCollectionNewName">Nuevo nombre:</label>
-                    <input type="text" id="editCollectionNewName" class="form-input" placeholder="Ingresa el nuevo nombre">
+                    <label for="editCollectionNewName" data-i18n="newNameLabel">Nuevo nombre:</label>
+                    <input type="text" id="editCollectionNewName" class="form-input" placeholder="Ingresa el nuevo nombre" data-i18n-placeholder="newNamePlaceholder">
                 </div>
                 <div class="modal-buttons">
-                    <button class="btn btn-secondary" id="cancelEditCollection">Cancelar</button>
-                    <button class="btn btn-primary" id="confirmEditCollection">Confirmar</button>
+                    <button class="modal-btn secondary" id="cancelEditCollection" data-i18n="cancel">Cancelar</button>
+                    <button class="modal-btn primary" id="confirmEditCollection" data-i18n="confirmBtn">Confirmar</button>
                 </div>
             </div>
         </div>
@@ -407,12 +428,12 @@ Key Features:
     <div class="modal" id="shareModal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Compartir Canción</h2>
+                <h2 data-i18n="shareTitle">Compartir Canción</h2>
                 <button class="modal-close" id="closeShareModal">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Canción:</label>
+                    <label data-i18n="trackLabel">Canción:</label>
                     <div class="file-info" id="shareTrackName">-</div>
                 </div>
                 <div class="share-options">
@@ -449,17 +470,17 @@ Key Features:
             <div class="modal-body">
                 <!-- Current file information -->
                 <div class="form-group">
-                    <label>Archivo actual:</label>
+                    <label data-i18n="currentFileLabel">Archivo actual:</label>
                     <div class="file-info" id="currentFileName">-</div>
                 </div>
                 <!-- Current format information -->
                 <div class="form-group">
-                    <label>Formato actual:</label>
+                    <label data-i18n="currentFormatLabel">Formato actual:</label>
                     <div class="file-info" id="currentFormat">-</div>
                 </div>
                 <!-- Target format selection dropdown -->
                 <div class="form-group">
-                    <label for="targetFormat">Convertir a:</label>
+                    <label for="targetFormat" data-i18n="convertToLabel">Convertir a:</label>
                     <select id="targetFormat" class="form-select">
                         <option value="wav">WAV</option>
                         <option value="aiff">AIFF</option>
@@ -472,7 +493,7 @@ Key Features:
                 </div>
                 <!-- Quality selection dropdown (bitrate for lossy formats) -->
                 <div class="form-group">
-                    <label for="quality">Calidad:</label>
+                    <label for="quality" data-i18n="qualityLabel">Calidad:</label>
                     <select id="quality" class="form-select">
                         <option value="high">Alta (320 kbps)</option>
                         <option value="medium" selected>Media (192 kbps)</option>
@@ -482,7 +503,7 @@ Key Features:
                 </div>
                 <!-- Output path selection with browse button -->
                 <div class="form-group">
-                    <label for="outputPath">Guardar en:</label>
+                    <label for="outputPath" data-i18n="saveToLabel">Guardar en:</label>
                     <div class="path-selector">
                         <input type="text" id="outputPath" class="form-input" readonly>
                         <button class="browse-btn" id="browseOutputPath">
@@ -589,10 +610,20 @@ Key Features:
     <div class="modal" id="eqModal" style="display: none;">
         <div class="modal-content eq-modal-content">
             <div class="modal-header">
-                <h2>Ecualizador</h2>
+                <h2 data-i18n="equalizerTitle">Ecualizador</h2>
                 <button class="modal-close" id="closeEqModal">&times;</button>
             </div>
             <div class="modal-body">
+                <!-- EQ mode selector -->
+                <div class="eq-mode-selector">
+                    <label data-i18n="eqModeLabel">Modo:</label>
+                    <select id="eqModeSelect">
+                        <option value="default" data-i18n="eqModeDefault">Default</option>
+                        <option value="custom" data-i18n="eqModeCustom">Personalizado</option>
+                        <option value="preset" data-i18n="eqModePreset">Pre-programado</option>
+                    </select>
+                    <button class="eq-save-btn" id="eqSaveBtn" data-i18n="eqSaveCustom">Guardar Personalizado</button>
+                </div>
                 <!-- EQ preset buttons - quick configurations for different music genres -->
                 <div class="eq-presets">
                     <button class="eq-preset-btn" data-preset="flat">Plano</button>
@@ -735,7 +766,7 @@ Key Features:
                     </ul>
                     <p class="learn-more"><a href="#" id="learnMoreLink" style="color: #ff6b35; text-decoration: none;">Learn More</a></p>
                     <div class="credits-section" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #444; text-align: center;">
-                        <p id="creditsText" style="color: #888; font-size: 13px; margin-bottom: 5px;">ARIA Music Player fue creado por La Tribu de Los Libres</p>
+                        <p id="creditsText" style="color: #888; font-size: 13px; margin-bottom: 5px;">ARIA Music Player fue creado por La Tribu de Los Libres Costa Rica</p>
                         <p id="contactText" style="color: #ff6b35; font-size: 13px;">lthikingcr@gmail.com</p>
                     </div>
                     <div class="form-group">
@@ -769,34 +800,34 @@ Key Features:
     <div class="modal" id="infoModal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Información de la Canción</h2>
+                <h2 data-i18n="infoTitle">Información de la Canción</h2>
                 <button class="modal-close" id="closeInfoModal">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label>Nombre de la Canción:</label>
+                    <label data-i18n="trackLabel">Nombre de la Canción:</label>
                     <div class="file-info" id="infoTrackName">-</div>
                 </div>
                 <div class="form-group">
-                    <label>Bitrate:</label>
+                    <label data-i18n="bitrate">Bitrate:</label>
                     <div class="file-info" id="infoBitrate">-</div>
                 </div>
                 <div class="form-group">
-                    <label>Hz:</label>
+                    <label data-i18n="hz">Hz:</label>
                     <div class="file-info" id="infoSampleRate">-</div>
                 </div>
                 <div class="form-group">
-                    <label>Tamaño:</label>
+                    <label data-i18n="size">Tamaño:</label>
                     <div class="file-info" id="infoFileSize">-</div>
                 </div>
                 <div class="form-group">
-                    <label>Ubicación:</label>
+                    <label data-i18n="location">Ubicación:</label>
                     <div class="file-info" id="infoLocation">-</div>
                 </div>
                 <div class="form-group">
                     <button class="action-btn" id="openLocationBtn" style="width: 100%; margin-top: 10px;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="pointer-events:none;vertical-align:middle;margin-right:6px"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
-                        Abrir Ubicación
+                        <span data-i18n="openLocation">Abrir Ubicación</span>
                     </button>
                 </div>
             </div>
@@ -811,11 +842,11 @@ Key Features:
     <div class="modal" id="deleteConfirmModal" style="display: none;">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Confirmar Eliminación</h2>
+                <h2 data-i18n="confirmDeleteTitle">Confirmar Eliminación</h2>
                 <button class="modal-close" id="closeDeleteConfirmModal">&times;</button>
             </div>
             <div class="modal-body">
-                <p>¿Estás seguro de que deseas eliminar esta canción de la lista de reproducción?</p>
+                <p data-i18n="confirmDeleteMessage">¿Estás seguro de que deseas eliminar esta canción de la lista de reproducción?</p>
                 <div class="form-group" style="margin-top: 20px; display: flex; gap: 10px;">
                     <button class="action-btn" id="confirmDeleteBtn" style="flex: 1; background: #ff5252;">
                         <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="pointer-events:none;vertical-align:middle;margin-right:6px"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>

@@ -97,7 +97,9 @@ let addFilesBtn, addFolderBtn, editMetadataBtn;
 let languageSelector;
 
 // Context menus - right-click menus for tracks and collections
-let contextMenu, collectionContextMenu;
+let contextMenu, collectionContextMenu, headerContextMenu, favoritesContextMenu;
+let headerContextMenuTarget = null; // Which header triggered the context menu
+let favoritesContextMenuPath = null; // Which favorite track path triggered the context menu
 
 // Conversion modal elements - for audio conversion feature
 let conversionModal, progressModal, currentFileName, currentFormat, targetFormat, quality, outputPath, progressFill, progressText;
@@ -158,6 +160,7 @@ const EQ_PRESETS = {
 
 let eqBands = [];   // Array of BiquadFilterNode objects - one for each frequency band
 let currentEQPreset = 'flat';  // String - currently selected EQ preset name
+let currentEQMode = 'default';  // String - current EQ mode: default, custom, preset
 
 // ============================================================================
 // DOM INITIALIZATION
@@ -220,29 +223,11 @@ function initDOMElements() {
 
     // Add collapse button listener for favorites
     const collapseFavoritesBtn = document.getElementById('collapseFavoritesBtn');
-    favoritesHeader = document.getElementById('favoritesHeader');
     if (collapseFavoritesBtn) {
         collapseFavoritesBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             toggleFavoritesCollapse();
         });
-    }
-    if (favoritesHeader) {
-        favoritesHeader.addEventListener('click', (e) => {
-            if (!e.target.closest('#playFavoritesBtn')) toggleFavoritesCollapse();
-        });
-        favoritesHeader.addEventListener('wheel', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const favListEl = document.getElementById('favoritesList');
-            if (e.deltaY > 0) {
-                favListEl.classList.remove('collapsed');
-                document.getElementById('collapseFavoritesBtn').classList.remove('collapsed');
-            } else {
-                favListEl.classList.add('collapsed');
-                document.getElementById('collapseFavoritesBtn').classList.add('collapsed');
-            }
-        }, { passive: false });
     }
 
     // Add collapse button listener
@@ -282,11 +267,39 @@ function initDOMElements() {
         // Add hover listener to collapse playlist when hovering collections
         collectionsHeader.addEventListener('mouseenter', () => {
             const playlistEl = document.getElementById('playlist');
-            if (playlistEl) {
+            // Only collapse playlist if it has auto-collapse enabled
+            if (playlistEl && playlistHeader.dataset.autoCollapse === 'true') {
                 playlistEl.classList.add('collapsed');
                 document.getElementById('collapsePlaylistBtn').classList.add('collapsed');
             }
+            // Auto-expand collections if auto-collapse is enabled
+            if (collectionsHeader.dataset.autoCollapse === 'true') {
+                const collectionsEl = document.getElementById('collections');
+                if (collectionsEl) {
+                    collectionsEl.classList.remove('collapsed');
+                    document.getElementById('collapseCollectionsBtn').classList.remove('collapsed');
+                }
+            }
         });
+        // Only listen to mouseleave on the collections element itself
+        // This allows user to interact with the content without it collapsing
+        const collectionsEl = document.getElementById('collections');
+        if (collectionsEl) {
+            collectionsEl.addEventListener('mouseenter', () => {
+                // Keep expanded while mouse is over the content
+                if (collectionsHeader.dataset.autoCollapse === 'true') {
+                    collectionsEl.classList.remove('collapsed');
+                    document.getElementById('collapseCollectionsBtn').classList.remove('collapsed');
+                }
+            });
+            collectionsEl.addEventListener('mouseleave', () => {
+                if (collectionsHeader.dataset.autoCollapse === 'true') {
+                    collectionsEl.classList.add('collapsed');
+                    document.getElementById('collapseCollectionsBtn').classList.add('collapsed');
+                }
+            });
+        }
+        collectionsHeader.addEventListener('contextmenu', (e) => showHeaderContextMenu(e, collectionsHeader));
     }
 
     // Add click listener to playlist header to toggle collapse
@@ -310,11 +323,59 @@ function initDOMElements() {
         // Add hover listener to collapse collections when hovering playlist
         playlistHeader.addEventListener('mouseenter', () => {
             const collectionsEl = document.getElementById('collections');
-            if (collectionsEl) {
+            // Only collapse collections if it has auto-collapse enabled
+            if (collectionsEl && collectionsHeader.dataset.autoCollapse === 'true') {
                 collectionsEl.classList.add('collapsed');
                 document.getElementById('collapseCollectionsBtn').classList.add('collapsed');
             }
+            // Auto-expand playlist if auto-collapse is enabled
+            if (playlistHeader.dataset.autoCollapse === 'true') {
+                const playlistEl = document.getElementById('playlist');
+                if (playlistEl) {
+                    playlistEl.classList.remove('collapsed');
+                    document.getElementById('collapsePlaylistBtn').classList.remove('collapsed');
+                }
+            }
         });
+        // Only listen to mouseleave on the playlist element itself
+        // This allows user to interact with the content without it collapsing
+        const playlistEl = document.getElementById('playlist');
+        if (playlistEl) {
+            playlistEl.addEventListener('mouseenter', () => {
+                // Keep expanded while mouse is over the content
+                if (playlistHeader.dataset.autoCollapse === 'true') {
+                    playlistEl.classList.remove('collapsed');
+                    document.getElementById('collapsePlaylistBtn').classList.remove('collapsed');
+                }
+            });
+            playlistEl.addEventListener('mouseleave', () => {
+                if (playlistHeader.dataset.autoCollapse === 'true') {
+                    playlistEl.classList.add('collapsed');
+                    document.getElementById('collapsePlaylistBtn').classList.add('collapsed');
+                }
+            });
+        }
+        playlistHeader.addEventListener('contextmenu', (e) => showHeaderContextMenu(e, playlistHeader));
+    }
+
+    // Add context menu to favorites header
+    favoritesHeader = document.getElementById('favoritesHeader');
+    if (favoritesHeader) {
+        favoritesHeader.addEventListener('click', (e) => {
+            if (!e.target.closest('#playFavoritesBtn')) toggleFavoritesCollapse();
+        });
+        favoritesHeader.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const favListEl = document.getElementById('favoritesList');
+            if (e.deltaY > 0) {
+                favListEl.classList.remove('collapsed');
+                document.getElementById('collapseFavoritesBtn').classList.remove('collapsed');
+            } else {
+                favListEl.classList.add('collapsed');
+                document.getElementById('collapseFavoritesBtn').classList.add('collapsed');
+            }
+        }, { passive: false });
     }
 
     // Language selector dropdown for UI translation
@@ -323,6 +384,8 @@ function initDOMElements() {
     // Context menus - right-click menus for tracks and collections
     contextMenu = document.getElementById('contextMenu');
     collectionContextMenu = document.getElementById('collectionContextMenu');
+    headerContextMenu = document.getElementById('headerContextMenu');
+    favoritesContextMenu = document.getElementById('favoritesContextMenu');
 
     // Conversion modal elements - for audio conversion feature
     conversionModal = document.getElementById('conversionModal');
@@ -852,6 +915,12 @@ function initEventListeners() {
         if (collectionContextMenu.style.display === 'block' && !collectionContextMenu.contains(e.target)) {
             hideCollectionContextMenu();
         }
+        if (headerContextMenu.style.display === 'block' && !headerContextMenu.contains(e.target)) {
+            hideHeaderContextMenu();
+        }
+        if (favoritesContextMenu.style.display === 'block' && !favoritesContextMenu.contains(e.target)) {
+            hideFavoritesContextMenu();
+        }
     });
 
     // Conversion modal handlers
@@ -880,6 +949,36 @@ function initEventListeners() {
         }
         hideEditCollectionModal();
     });
+
+    // Header context menu handlers
+    document.getElementById('headerContextKeepExpanded').addEventListener('click', () => {
+        if (headerContextMenuTarget) {
+            headerContextMenuTarget.dataset.autoCollapse = 'false';
+            saveHeaderCollapseState(headerContextMenuTarget.id, 'false');
+            // Expand the section immediately
+            expandHeaderSection(headerContextMenuTarget.id);
+        }
+        hideHeaderContextMenu();
+    });
+
+    document.getElementById('headerContextAutoCollapse').addEventListener('click', () => {
+        if (headerContextMenuTarget) {
+            headerContextMenuTarget.dataset.autoCollapse = 'true';
+            saveHeaderCollapseState(headerContextMenuTarget.id, 'true');
+        }
+        hideHeaderContextMenu();
+    });
+
+    // Favorites context menu handlers
+    document.getElementById('favoritesContextRemove').addEventListener('click', () => {
+        if (favoritesContextMenuPath) {
+            if (confirm('¿Eliminar esta canción de favoritos?')) {
+                toggleFavoritePath(favoritesContextMenuPath);
+            }
+        }
+        hideFavoritesContextMenu();
+    });
+
     document.getElementById('browseOutputPath').addEventListener('click', async () => {
         const savePath = await ipcRenderer.invoke('select-save-path');
         if (savePath) {
@@ -1184,10 +1283,32 @@ function initEventListeners() {
     document.querySelectorAll('.eq-preset-btn').forEach(btn => {
         btn.addEventListener('click', () => applyEQPreset(btn.dataset.preset));
     });
+
+    // EQ mode selector
+    const eqModeSelect = document.getElementById('eqModeSelect');
+    if (eqModeSelect) {
+        eqModeSelect.addEventListener('change', (e) => {
+            currentEQMode = e.target.value;
+            handleEQModeChange();
+        });
+    }
+
+    // EQ save button
+    const eqSaveBtn = document.getElementById('eqSaveBtn');
+    if (eqSaveBtn) {
+        eqSaveBtn.addEventListener('click', saveCustomEQ);
+    }
+
     EQ_FREQUENCIES.forEach((_, i) => {
         const slider = document.getElementById(`eq-band-${i}`);
         const valEl  = document.getElementById(`eq-val-${i}`);
         if (!slider) return;
+
+        // Prevent window drag when interacting with slider
+        slider.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+        });
+
         slider.addEventListener('input', () => {
             const val = parseFloat(slider.value);
             if (eqBands[i]) eqBands[i].gain.value = val;
@@ -1195,7 +1316,55 @@ function initEventListeners() {
             // Mark as manual (no preset active)
             document.querySelectorAll('.eq-preset-btn').forEach(b => b.classList.remove('active'));
             currentEQPreset = 'manual';
+            currentEQMode = 'custom';
+            const eqModeSelect = document.getElementById('eqModeSelect');
+            if (eqModeSelect) eqModeSelect.value = 'custom';
         });
+
+        // Keyboard support (arrow keys)
+        slider.addEventListener('keydown', (e) => {
+            e.stopPropagation();
+            const val = parseFloat(slider.value);
+            const step = 1;
+            let newVal = val;
+
+            if (e.key === 'ArrowUp' || e.key === 'ArrowRight') {
+                newVal = Math.min(val + step, 12);
+                e.preventDefault();
+            } else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') {
+                newVal = Math.max(val - step, -12);
+                e.preventDefault();
+            }
+
+            if (newVal !== val) {
+                slider.value = newVal;
+                if (eqBands[i]) eqBands[i].gain.value = newVal;
+                if (valEl) valEl.textContent = (newVal > 0 ? '+' : '') + newVal;
+                document.querySelectorAll('.eq-preset-btn').forEach(b => b.classList.remove('active'));
+                currentEQPreset = 'manual';
+            }
+        });
+
+        // Mouse wheel support
+        slider.addEventListener('wheel', (e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            const val = parseFloat(slider.value);
+            const step = 1;
+            let newVal = val;
+
+            if (e.deltaY < 0) {
+                newVal = Math.min(val + step, 12);
+            } else {
+                newVal = Math.max(val - step, -12);
+            }
+
+            slider.value = newVal;
+            if (eqBands[i]) eqBands[i].gain.value = newVal;
+            if (valEl) valEl.textContent = (newVal > 0 ? '+' : '') + newVal;
+            document.querySelectorAll('.eq-preset-btn').forEach(b => b.classList.remove('active'));
+            currentEQPreset = 'manual';
+        }, { passive: false });
     });
 }
 
@@ -2080,6 +2249,7 @@ function renderFavorites() {
                     playTrack(trackIndex);
                     renderFavorites(); // update playing highlight
                 });
+                item.addEventListener('contextmenu', (e) => showFavoritesContextMenu(e, track.path));
                 favoritesList.appendChild(item);
             });
         });
@@ -2787,6 +2957,20 @@ function updateLanguage() {
             else if (preset === 'acoustic') btn.textContent = t.eqPresetAcoustic;
         });
 
+        // Update edit collection modal
+        const editCollectionTitle = document.querySelector('#editCollectionModal h2');
+        if (editCollectionTitle) editCollectionTitle.textContent = t.editCollectionTitle;
+        const currentNameLabel = document.querySelector('#editCollectionModal label:nth-of-type(1)');
+        if (currentNameLabel) currentNameLabel.textContent = t.currentNameLabel;
+        const newNameLabel = document.querySelector('#editCollectionModal label:nth-of-type(2)');
+        if (newNameLabel) newNameLabel.textContent = t.newNameLabel;
+        const newNameInput = document.getElementById('editCollectionNewName');
+        if (newNameInput) newNameInput.placeholder = t.newNamePlaceholder;
+        const cancelEditCollection = document.getElementById('cancelEditCollection');
+        if (cancelEditCollection) cancelEditCollection.textContent = t.cancel;
+        const confirmEditCollection = document.getElementById('confirmEditCollection');
+        if (confirmEditCollection) confirmEditCollection.textContent = t.confirmBtn;
+
         // Update metadata modal
         const metaTitle = document.querySelector('#metadataModal h2');
         if (metaTitle) metaTitle.textContent = t.metadataTitle;
@@ -2865,7 +3049,57 @@ function updateLanguage() {
         const contextRemove = document.getElementById('contextRemove');
         if (contextRemove) contextRemove.textContent = t.contextRemove;
         const collectionContextDelete = document.getElementById('collectionContextDelete');
-        if (collectionContextDelete) collectionContextDelete.textContent = t.contextDeleteCollection;
+        if (collectionContextDelete) collectionContextDelete.textContent = t.deleteCollection;
+        const collectionContextEdit = document.getElementById('collectionContextEdit');
+        if (collectionContextEdit) collectionContextEdit.textContent = t.collectionContextEdit;
+
+        // Update header context menu items
+        const headerContextKeepExpanded = document.getElementById('headerContextKeepExpanded');
+        if (headerContextKeepExpanded) headerContextKeepExpanded.textContent = t.headerContextKeepExpanded;
+        const headerContextAutoCollapse = document.getElementById('headerContextAutoCollapse');
+        if (headerContextAutoCollapse) headerContextAutoCollapse.textContent = t.headerContextAutoCollapse;
+
+        // Update favorites context menu items
+        const favoritesContextRemove = document.getElementById('favoritesContextRemove');
+        if (favoritesContextRemove) favoritesContextRemove.textContent = t.favoritesContextRemove;
+
+        // Update equalizer mode selector
+        const eqModeLabel = document.querySelector('.eq-mode-selector label');
+        if (eqModeLabel) eqModeLabel.textContent = t.eqModeLabel;
+        const eqModeSelect = document.getElementById('eqModeSelect');
+        if (eqModeSelect) {
+            const eqModeOptions = eqModeSelect.querySelectorAll('option');
+            if (eqModeOptions.length >= 3) {
+                eqModeOptions[0].textContent = t.eqModeDefault;
+                eqModeOptions[1].textContent = t.eqModeCustom;
+                eqModeOptions[2].textContent = t.eqModePreset;
+            }
+        }
+        const eqSaveBtn = document.getElementById('eqSaveBtn');
+        if (eqSaveBtn) eqSaveBtn.textContent = t.eqSaveCustom;
+
+        // Update share modal
+        const shareTitle = document.querySelector('#shareModal h2');
+        if (shareTitle) shareTitle.textContent = t.shareTitle;
+        const shareTrackLabel = document.querySelector('#shareModal label');
+        if (shareTrackLabel) shareTrackLabel.textContent = t.trackLabel;
+
+        // Update info modal
+        const infoTitle = document.querySelector('#infoModal h2');
+        if (infoTitle) infoTitle.textContent = t.infoTitle;
+        const infoLabels = document.querySelectorAll('#infoModal label');
+        if (infoLabels.length >= 5) {
+            infoLabels[0].textContent = t.trackLabel;
+            infoLabels[1].textContent = t.bitrate;
+            infoLabels[2].textContent = t.hz;
+            infoLabels[3].textContent = t.size;
+            infoLabels[4].textContent = t.location;
+        }
+        const openLocationBtn = document.getElementById('openLocationBtn');
+        if (openLocationBtn) {
+            const openLocationSpan = openLocationBtn.querySelector('span');
+            if (openLocationSpan) openLocationSpan.textContent = t.openLocation;
+        }
 
         // Update conversion modal labels
         if (conversionModal) {
@@ -2875,11 +3109,11 @@ function updateLanguage() {
             }
             const conversionLabels = conversionModal.querySelectorAll('.form-group label');
             if (conversionLabels.length >= 5) {
-                conversionLabels[0].textContent = t.currentFile;
-                conversionLabels[1].textContent = t.currentFormat;
-                conversionLabels[2].textContent = t.convertTo;
-                conversionLabels[3].textContent = t.quality;
-                conversionLabels[4].textContent = t.saveTo;
+                conversionLabels[0].textContent = t.currentFileLabel;
+                conversionLabels[1].textContent = t.currentFormatLabel;
+                conversionLabels[2].textContent = t.convertToLabel;
+                conversionLabels[3].textContent = t.qualityLabel;
+                conversionLabels[4].textContent = t.saveToLabel;
             }
         }
         if (quality) {
@@ -2905,6 +3139,42 @@ function updateLanguage() {
                 progressModalTitle.textContent = t.converting;
             }
         }
+
+        // Update delete confirmation modal
+        const deleteConfirmTitle = document.querySelector('#deleteConfirmModal h2');
+        if (deleteConfirmTitle) deleteConfirmTitle.textContent = t.confirmDeleteTitle;
+        const deleteConfirmMessage = document.querySelector('#deleteConfirmModal p');
+        if (deleteConfirmMessage) deleteConfirmMessage.textContent = t.confirmDeleteMessage;
+
+        // Update tooltips
+        const titleBarTheme = document.getElementById('titleBarTheme');
+        if (titleBarTheme) titleBarTheme.title = t.tooltipTheme;
+        const winMinimize = document.getElementById('winMinimize');
+        if (winMinimize) winMinimize.title = t.tooltipMinimize;
+        const winMaximize = document.getElementById('winMaximize');
+        if (winMaximize) winMaximize.title = t.tooltipMaximize;
+        const winClose = document.getElementById('winClose');
+        if (winClose) winClose.title = t.tooltipClose;
+        const helpBtnTop = document.getElementById('helpBtnTop');
+        if (helpBtnTop) helpBtnTop.title = t.tooltipHelp;
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        if (shuffleBtn) shuffleBtn.title = t.tooltipShuffle;
+        const repeatBtn = document.getElementById('repeatBtn');
+        if (repeatBtn) repeatBtn.title = t.tooltipRepeat;
+        const recordBtn = document.getElementById('recordBtn');
+        if (recordBtn) recordBtn.title = t.tooltipRecord;
+        const playFavoritesBtn = document.getElementById('playFavoritesBtn');
+        if (playFavoritesBtn) playFavoritesBtn.title = t.tooltipPlayFavorites;
+
+        // Update empty messages and headers
+        const emptyCollections = document.querySelector('#collections .empty-playlist');
+        if (emptyCollections) emptyCollections.textContent = t.emptyCollections;
+        const playlistHeaderText = document.getElementById('playlistHeaderText');
+        if (playlistHeaderText) playlistHeaderText.textContent = t.playlistHeader;
+        const selectCollection = document.querySelector('#playlist .empty-playlist');
+        if (selectCollection) selectCollection.textContent = t.selectCollection;
+        const noFavorites = document.querySelector('#favoritesList .empty-favorites');
+        if (noFavorites) noFavorites.textContent = t.noFavorites;
     } catch (error) {
         console.error('Error updating language:', error);
     }
@@ -2954,6 +3224,107 @@ function hideContextMenu() {
 // Hide collection context menu
 function hideCollectionContextMenu() {
     collectionContextMenu.style.display = 'none';
+}
+
+// Hide header context menu
+function hideHeaderContextMenu() {
+    headerContextMenu.style.display = 'none';
+    headerContextMenuTarget = null;
+}
+
+// Hide favorites context menu
+function hideFavoritesContextMenu() {
+    favoritesContextMenu.style.display = 'none';
+    favoritesContextMenuPath = null;
+}
+
+// Show favorites context menu at mouse position
+function showFavoritesContextMenu(e, path) {
+    e.preventDefault();
+    favoritesContextMenuPath = path;
+    favoritesContextMenu.style.display = 'block';
+
+    const menuWidth = favoritesContextMenu.offsetWidth || 180;
+    const menuHeight = favoritesContextMenu.offsetHeight || 40;
+
+    let left = e.pageX;
+    let top = e.pageY;
+
+    if (left + menuWidth > window.innerWidth) {
+        left = window.innerWidth - menuWidth - 10;
+    }
+    if (top + menuHeight > window.innerHeight) {
+        top = window.innerHeight - menuHeight - 10;
+    }
+
+    favoritesContextMenu.style.left = `${left}px`;
+    favoritesContextMenu.style.top = `${top}px`;
+}
+
+// Show header context menu at mouse position
+function showHeaderContextMenu(e, target) {
+    e.preventDefault();
+    headerContextMenuTarget = target;
+    headerContextMenu.style.display = 'block';
+
+    const menuWidth = headerContextMenu.offsetWidth || 180;
+    const menuHeight = headerContextMenu.offsetHeight || 80;
+
+    let left = e.pageX;
+    let top = e.pageY;
+
+    if (left + menuWidth > window.innerWidth) {
+        left = window.innerWidth - menuWidth - 10;
+    }
+    if (top + menuHeight > window.innerHeight) {
+        top = window.innerHeight - menuHeight - 10;
+    }
+
+    headerContextMenu.style.left = `${left}px`;
+    headerContextMenu.style.top = `${top}px`;
+}
+
+// Save header collapse state to localStorage
+function saveHeaderCollapseState(headerId, autoCollapse) {
+    const state = JSON.parse(localStorage.getItem('headerCollapseState') || '{}');
+    state[headerId] = autoCollapse;
+    localStorage.setItem('headerCollapseState', JSON.stringify(state));
+}
+
+// Load header collapse state from localStorage
+function loadHeaderCollapseStates() {
+    const state = JSON.parse(localStorage.getItem('headerCollapseState') || '{}');
+    // Initialize all headers with default value first
+    const headers = ['collectionsHeader', 'playlistHeader'];
+    headers.forEach(headerId => {
+        const header = document.getElementById(headerId);
+        if (header) {
+            header.dataset.autoCollapse = state[headerId] || 'false';
+        }
+    });
+}
+
+// Expand a header section immediately
+function expandHeaderSection(headerId) {
+    if (headerId === 'collectionsHeader') {
+        const collectionsEl = document.getElementById('collections');
+        if (collectionsEl) {
+            collectionsEl.classList.remove('collapsed');
+            document.getElementById('collapseCollectionsBtn').classList.remove('collapsed');
+        }
+    } else if (headerId === 'playlistHeader') {
+        const playlistEl = document.getElementById('playlist');
+        if (playlistEl) {
+            playlistEl.classList.remove('collapsed');
+            document.getElementById('collapsePlaylistBtn').classList.remove('collapsed');
+        }
+    } else if (headerId === 'favoritesHeader') {
+        const favListEl = document.getElementById('favoritesList');
+        if (favListEl) {
+            favListEl.classList.remove('collapsed');
+            document.getElementById('collapseFavoritesBtn').classList.remove('collapsed');
+        }
+    }
 }
 
 // Show collection context menu at mouse position
@@ -3026,6 +3397,7 @@ function hideMetadataModal() {
 function applyEQPreset(presetName) {
     const gains = EQ_PRESETS[presetName] || EQ_PRESETS.flat;
     currentEQPreset = presetName;
+    currentEQMode = presetName === 'flat' ? 'default' : 'preset';
     gains.forEach((gain, i) => {
         if (eqBands[i]) eqBands[i].gain.value = gain;
         const slider = document.getElementById(`eq-band-${i}`);
@@ -3036,6 +3408,58 @@ function applyEQPreset(presetName) {
     document.querySelectorAll('.eq-preset-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.preset === presetName);
     });
+    // Update mode selector
+    const eqModeSelect = document.getElementById('eqModeSelect');
+    if (eqModeSelect) eqModeSelect.value = currentEQMode;
+}
+
+// Handle EQ mode change
+function handleEQModeChange() {
+    const eqModeSelect = document.getElementById('eqModeSelect');
+    if (!eqModeSelect) return;
+
+    switch (currentEQMode) {
+        case 'default':
+            // Default = no EQ adjustment (all values at 0)
+            applyEQPreset('flat');
+            break;
+        case 'custom':
+            loadCustomEQ();
+            break;
+        case 'preset':
+            // Keep current preset active
+            break;
+    }
+}
+
+// Save custom EQ settings
+function saveCustomEQ() {
+    const gains = [];
+    EQ_FREQUENCIES.forEach((_, i) => {
+        const slider = document.getElementById(`eq-band-${i}`);
+        if (slider) gains.push(parseFloat(slider.value));
+    });
+    localStorage.setItem('customEQ', JSON.stringify(gains));
+    currentEQMode = 'custom';
+    const eqModeSelect = document.getElementById('eqModeSelect');
+    if (eqModeSelect) eqModeSelect.value = 'custom';
+    alert('Ajuste personalizado guardado');
+}
+
+// Load custom EQ settings
+function loadCustomEQ() {
+    const saved = localStorage.getItem('customEQ');
+    if (saved) {
+        const gains = JSON.parse(saved);
+        gains.forEach((gain, i) => {
+            if (eqBands[i]) eqBands[i].gain.value = gain;
+            const slider = document.getElementById(`eq-band-${i}`);
+            const valEl  = document.getElementById(`eq-val-${i}`);
+            if (slider) slider.value = gain;
+            if (valEl)  valEl.textContent = (gain > 0 ? '+' : '') + gain;
+        });
+        document.querySelectorAll('.eq-preset-btn').forEach(b => b.classList.remove('active'));
+    }
 }
 
 // ============================================================================
@@ -3051,8 +3475,9 @@ function showConversionModal(index) {
     currentFileName.textContent = track.fileName;
     currentFormat.textContent = extension.toUpperCase();
 
-    // Set default output path (same directory, new extension)
-    const defaultPath = track.path.replace(/\.[^/.]+$/, `.${targetFormat.value}`);
+    // Set default output path (same directory, new extension, with _converted suffix)
+    const pathWithoutExt = track.path.replace(/\.[^/.]+$/, '');
+    const defaultPath = `${pathWithoutExt}_converted.${targetFormat.value}`;
     outputPath.value = defaultPath;
 
     conversionModal.style.display = 'flex';
@@ -3225,6 +3650,7 @@ async function saveState() {
         currentTime: audioElement1 ? audioElement1.currentTime : 0,
         volume: volumeSlider ? parseInt(volumeSlider.value) : 100,
         eqPreset: currentEQPreset,
+        eqMode: currentEQMode,
         eqGains: eqBands.map(b => b.gain.value),
         theme: currentTheme  // Save current theme preference
     };
@@ -3318,6 +3744,11 @@ async function loadState() {
                 if (btn.textContent === state.eqPreset) btn.classList.add('active');
             });
         }
+        if (state.eqMode) {
+            currentEQMode = state.eqMode;
+            const eqModeSelect = document.getElementById('eqModeSelect');
+            if (eqModeSelect) eqModeSelect.value = state.eqMode;
+        }
     }
 
     // Restore theme
@@ -3386,6 +3817,11 @@ window.addEventListener('load', () => {
         console.log('loadState done');
     } catch (e) {
         console.error('loadState error:', e);
+    }
+    try {
+        loadHeaderCollapseStates();  // Restore header collapse preferences
+    } catch (e) {
+        console.error('loadHeaderCollapseStates error:', e);
     }
     console.log('All initialization done');
 });

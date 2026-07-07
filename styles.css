@@ -1787,6 +1787,47 @@ body {
     max-width: 95vw;
 }
 
+/* EQ mode selector */
+.eq-mode-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border);
+}
+
+.eq-mode-selector label {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.eq-mode-selector select {
+    flex: 1;
+    padding: 6px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--button-bg);
+    color: var(--text-primary);
+    font-size: 13px;
+    cursor: pointer;
+}
+
+.eq-save-btn {
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: none;
+    background: var(--accent);
+    color: white;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.eq-save-btn:hover {
+    background: var(--accent-hover);
+}
+
 /* EQ preset buttons - quick configurations for different music genres */
 .eq-presets {
     display: flex;
