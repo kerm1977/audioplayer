@@ -583,12 +583,16 @@ function initEventListeners() {
         coverFullscreenModal.addEventListener('click', (e) => {
             if (e.target === coverFullscreenModal) resetCoverHideTimer();
         });
-        coverFullscreenModal.addEventListener('dblclick', () => {
+    }
+
+    // Double click anywhere in fullscreen modal to close
+    document.addEventListener('dblclick', (e) => {
+        if (coverFullscreenModal && coverFullscreenModal.classList.contains('active')) {
             coverFullscreenModal.classList.remove('active');
             clearTimeout(coverHideTimer);
             ipcRenderer.send('exit-fullscreen');
-        });
-    }
+        }
+    });
 
     if (coverFullscreenClose) {
         coverFullscreenClose.addEventListener('click', () => {
