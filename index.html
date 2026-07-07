@@ -366,7 +366,36 @@ Key Features:
          Hidden by default, shown via JavaScript on right-click event.
     -->
     <div class="context-menu" id="collectionContextMenu" style="display: none;">
-        <div class="context-menu-item" id="collectionContextDelete">🗑 Eliminar Colección</div>
+        <div class="context-menu-item" id="collectionContextEdit">Editar Nombre</div>
+        <div class="context-menu-item" id="collectionContextDelete">Eliminar Colección</div>
+    </div>
+
+    <!-- ============================================================================
+         EDIT COLLECTION NAME MODAL
+         ============================================================================
+         Modal dialog for editing collection name.
+    -->
+    <div class="modal" id="editCollectionModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Editar Nombre de Colección</h2>
+                <button class="modal-close" id="closeEditCollectionModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Nombre actual:</label>
+                    <div class="file-info" id="editCollectionCurrentName">-</div>
+                </div>
+                <div class="form-group">
+                    <label for="editCollectionNewName">Nuevo nombre:</label>
+                    <input type="text" id="editCollectionNewName" class="form-input" placeholder="Ingresa el nuevo nombre">
+                </div>
+                <div class="modal-buttons">
+                    <button class="btn btn-secondary" id="cancelEditCollection">Cancelar</button>
+                    <button class="btn btn-primary" id="confirmEditCollection">Confirmar</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- ============================================================================

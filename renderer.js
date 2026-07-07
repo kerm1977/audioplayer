@@ -105,6 +105,9 @@ let conversionModal, progressModal, currentFileName, currentFormat, targetFormat
 // Share modal elements - for sharing tracks
 let shareModal, shareTrackName, closeShareModal;
 
+// Edit collection name modal elements
+let editCollectionModal, editCollectionCurrentName, editCollectionNewName, closeEditCollectionModal, cancelEditCollection, confirmEditCollection;
+
 // Help modal elements
 let helpModal, closeHelpModal, helpBtn, helpBtnTop;
 
@@ -336,6 +339,14 @@ function initDOMElements() {
     shareModal = document.getElementById('shareModal');
     shareTrackName = document.getElementById('shareTrackName');
     closeShareModal = document.getElementById('closeShareModal');
+
+    // Edit collection name modal elements
+    editCollectionModal = document.getElementById('editCollectionModal');
+    editCollectionCurrentName = document.getElementById('editCollectionCurrentName');
+    editCollectionNewName = document.getElementById('editCollectionNewName');
+    closeEditCollectionModal = document.getElementById('closeEditCollectionModal');
+    cancelEditCollection = document.getElementById('cancelEditCollection');
+    confirmEditCollection = document.getElementById('confirmEditCollection');
 
     // Info modal elements - displays track information
     infoModal = document.getElementById('infoModal');
@@ -572,6 +583,11 @@ function initEventListeners() {
         coverFullscreenModal.addEventListener('click', (e) => {
             if (e.target === coverFullscreenModal) resetCoverHideTimer();
         });
+        coverFullscreenModal.addEventListener('dblclick', () => {
+            coverFullscreenModal.classList.remove('active');
+            clearTimeout(coverHideTimer);
+            ipcRenderer.send('exit-fullscreen');
+        });
     }
 
     if (coverFullscreenClose) {
@@ -784,7 +800,20 @@ function initEventListeners() {
         hideContextMenu();
     });
 
-    // Collection context menu handler
+    // Collection context menu handler - Edit name
+    document.getElementById('collectionContextEdit').addEventListener('click', () => {
+        if (collectionContextMenuIndex >= 0) {
+            const collectionName = collections[collectionContextMenuIndex].name;
+            editCollectionCurrentName.textContent = collectionName;
+            editCollectionNewName.value = collectionName;
+            editCollectionModal.style.display = 'flex';
+            editCollectionNewName.focus();
+            editCollectionNewName.select();
+        }
+        hideCollectionContextMenu();
+    });
+
+    // Collection context menu handler - Delete
     document.getElementById('collectionContextDelete').addEventListener('click', () => {
         if (collectionContextMenuIndex >= 0) {
             const collectionName = collections[collectionContextMenuIndex].name;
@@ -830,6 +859,23 @@ function initEventListeners() {
     document.getElementById('shareFacebook').addEventListener('click', () => shareViaFacebook(contextMenuIndex));
     document.getElementById('shareWhatsApp').addEventListener('click', () => shareViaWhatsApp(contextMenuIndex));
     document.getElementById('shareSearchApp').addEventListener('click', () => shareViaSearchApp(contextMenuIndex));
+
+    // Edit collection name modal handlers
+    closeEditCollectionModal.addEventListener('click', hideEditCollectionModal);
+    cancelEditCollection.addEventListener('click', hideEditCollectionModal);
+    confirmEditCollection.addEventListener('click', () => {
+        const newName = editCollectionNewName.value.trim();
+        if (newName && collectionContextMenuIndex >= 0) {
+            const oldName = collections[collectionContextMenuIndex].name;
+            if (newName !== oldName) {
+                if (confirm(`¿Confirmar cambio de nombre de "${oldName}" a "${newName}"?`)) {
+                    collections[collectionContextMenuIndex].name = newName;
+                    renderCollections();
+                }
+            }
+        }
+        hideEditCollectionModal();
+    });
     document.getElementById('browseOutputPath').addEventListener('click', async () => {
         const savePath = await ipcRenderer.invoke('select-save-path');
         if (savePath) {
@@ -1210,6 +1256,38 @@ function initAudio() {
     });
 
     setupVisualizer();  // Initialize spectrum visualizer
+    startNeonReactiveLoop();  // Start audio-reactive neon glow for fullscreen cover modal
+}
+
+// Drives the intensity of the fullscreen cover modal's neon glow using live audio frequency data,
+// so the glow pulses softly in sync with the music instead of animating at a fixed rate.
+function startNeonReactiveLoop() {
+    const modal = document.getElementById('coverFullscreenModal');
+    if (!modal || !analyser) return;
+
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+    let smoothedIntensity = 0.35;
+
+    function loop() {
+        requestAnimationFrame(loop);
+        if (!modal.classList.contains('active')) return;
+
+        const currentAnalyser = isRecording && microphoneAnalyser ? microphoneAnalyser : analyser;
+        currentAnalyser.getByteFrequencyData(dataArray);
+
+        let sum = 0;
+        for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
+        const avg = sum / bufferLength / 255; // normalized 0..1
+
+        // Map average volume to a soft opacity range and smooth it to avoid flicker
+        const targetIntensity = 0.25 + avg * 0.55;
+        smoothedIntensity += (targetIntensity - smoothedIntensity) * 0.15;
+
+        modal.style.setProperty('--neon-strength', smoothedIntensity.toFixed(3));
+    }
+
+    loop();
 }
 
 // ============================================================================
@@ -2991,6 +3069,11 @@ function showShareModal(index) {
 // Hide share modal
 function hideShareModal() {
     shareModal.style.display = 'none';
+}
+
+// Hide edit collection name modal
+function hideEditCollectionModal() {
+    editCollectionModal.style.display = 'none';
 }
 
 // Export collections backup
